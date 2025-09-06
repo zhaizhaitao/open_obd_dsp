@@ -68,7 +68,7 @@ const lv_img_dsc_t * ui_imgset_back[1] = {&ui_img_back111_png};
 
 //彩灯///
 extern  led_strip_handle_t led_strip;
-#define LED_STRIP_LED_NUMBERS 8
+#define LED_STRIP_LED_NUMBERS 1
 int color_RT=1;
 uint32_t red=150;
 uint32_t blue=0;
