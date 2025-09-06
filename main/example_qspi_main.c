@@ -51,8 +51,8 @@ static SemaphoreHandle_t lvgl_mux = NULL;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // The pixel number in horizontal and vertical
-#define EXAMPLE_LCD_H_RES             392// 466
-#define EXAMPLE_LCD_V_RES             392// 466
+#define EXAMPLE_LCD_H_RES             466// 466
+#define EXAMPLE_LCD_V_RES             466// 466
 
 #if CONFIG_VIEWE_SMARTRING
 #define EXAMPLE_LCD_HOST               (SPI2_HOST)
