@@ -51,7 +51,7 @@ static SemaphoreHandle_t lvgl_mux = NULL;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // The pixel number in horizontal and vertical
-#define EXAMPLE_LCD_H_RES             466// 466
+#define EXAMPLE_LCD_H_RES             476// 466 这儿是因为X轴有偏移量
 #define EXAMPLE_LCD_V_RES             466// 466
 
 #if CONFIG_VIEWE_SMARTRING
