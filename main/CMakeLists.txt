@@ -3,12 +3,11 @@ file(GLOB_RECURSE SOURCES_CPP *.cpp)
 
 idf_component_register(SRC_DIRS
                     "." 
-                    "ui/components"
-                    "ui/fonts"
-                    "ui/images"
-                    "ui/screens"
-                    "ui"
-                    "ui/fonts"
+                    "export_path/components"
+                    "export_path/fonts"
+                    "export_path/images"
+                    "export_path/screens"
+                    "export_path"
                     INCLUDE_DIRS
                     ".")
 
