@@ -1,12 +1,26 @@
 {
-    "files.associations": {
-        "esp_lcd_sh8601.h": "c",
-        "esp_lcd_touch_cst816s.h": "c",
-        "ui.h": "c",
-        "hf_encoder_butto.h": "c",
-        "ui_helpers.h": "c",
-        "ui_events.h": "c",
-        "lvgl.h": "c",
-        "sdkconfig.h": "c"
-    }
+  "files.associations": {
+    "esp_lcd_sh8601.h": "c",
+    "esp_lcd_touch_cst816s.h": "c",
+    "ui.h": "c",
+    "hf_encoder_butto.h": "c",
+    "ui_helpers.h": "c",
+    "ui_events.h": "c",
+    "lvgl.h": "c",
+    "sdkconfig.h": "c"
+  },
+  "idf.portWin": "COM3",
+  "idf.flashType": "UART",
+  "idf.openOcdConfigs": [
+    "board/esp32s3-builtin.cfg"
+  ],
+  "idf.customExtraVars": {
+    "IDF_TARGET": "esp32s3"
+  },
+  "clangd.path": "D:\\ESP32\\Espressif\\tools\\esp-clang\\15.0.0-23786128ae\\esp-clang\\bin\\clangd.exe",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=D:\\ESP32\\Espressif\\tools\\xtensa-esp32s3-elf\\esp-12.2.0_20230208\\xtensa-esp32s3-elf\\bin\\xtensa-esp32s3-elf-gcc.exe",
+    "--compile-commands-dir=c:\\Users\\zhair\\Desktop\\LCD_PRO\\DEMO\\My_Lcd_Pro\\build"
+  ]
 }
