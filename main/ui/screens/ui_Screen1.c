@@ -63,6 +63,9 @@ void ui_Screen1_screen_init(void)
     lv_obj_add_event_cb(ui_background, ui_event_background, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Button4, ui_event_Button4, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Button6, ui_event_Button6, LV_EVENT_ALL, NULL);
+    
+    // 也在屏幕上添加手势事件处理
+    lv_obj_add_event_cb(ui_Screen1, ui_event_background, LV_EVENT_GESTURE, NULL);
 
 
 
