@@ -37,7 +37,6 @@
 //*************************************************** */
 /*Choose to use the product*/
 #define CONFIG_VIEWE_SMARTRING            1
-#define CONFIG_VIEWE_UEDX46460015_MD50ET  0
 #define CONFIG_LCD_TOUCH_ENABLED          1
 
 
@@ -55,37 +54,7 @@ static SemaphoreHandle_t lvgl_mux = NULL;
 #define EXAMPLE_LCD_H_RES             471// 466
 #define EXAMPLE_LCD_V_RES             466// 466
 
-#if CONFIG_VIEWE_UEDX46460015_MD50ET
-#define EXAMPLE_LCD_HOST               (SPI2_HOST)
-#define EXAMPLE_LCD_BK_LIGHT_ON_LEVEL  1
-#define EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL !EXAMPLE_LCD_BK_LIGHT_ON_LEVEL
-#define EXAMPLE_PIN_NUM_LCD_CS            (GPIO_NUM_12)
-#define EXAMPLE_PIN_NUM_LCD_PCLK          (GPIO_NUM_10) 
-#define EXAMPLE_PIN_NUM_LCD_DATA0         (GPIO_NUM_13)
-#define EXAMPLE_PIN_NUM_LCD_DATA1         (GPIO_NUM_11)
-#define EXAMPLE_PIN_NUM_LCD_DATA2         (GPIO_NUM_14)
-#define EXAMPLE_PIN_NUM_LCD_DATA3         (GPIO_NUM_9)
-#define EXAMPLE_PIN_NUM_LCD_RST           (GPIO_NUM_8)
-#define EXAMPLE_PIN_NUM_BK_LIGHT          (GPIO_NUM_17)
-
-typedef enum {
-    BSP_BTN_PRESS = GPIO_NUM_0,
-} bsp_button_t;
-
-#define BSP_ENCODER_A         (GPIO_NUM_6)
-#define BSP_ENCODER_B         (GPIO_NUM_5)
-
-#if CONFIG_LCD_TOUCH_ENABLED
-#define EXAMPLE_TOUCH_HOST                (I2C_NUM_0)
-#define EXAMPLE_PIN_NUM_TOUCH_SCL         (GPIO_NUM_3)
-#define EXAMPLE_PIN_NUM_TOUCH_SDA         (GPIO_NUM_1)
-#define EXAMPLE_PIN_NUM_TOUCH_RST         (GPIO_NUM_2)
-#define EXAMPLE_PIN_NUM_TOUCH_INT         (GPIO_NUM_4)
-
-esp_lcd_touch_handle_t tp = NULL;
-#endif
-
-#elif CONFIG_VIEWE_SMARTRING
+#if CONFIG_VIEWE_SMARTRING
 #define EXAMPLE_LCD_HOST               (SPI2_HOST)
 #define EXAMPLE_LCD_BK_LIGHT_ON_LEVEL  1
 #define EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL !EXAMPLE_LCD_BK_LIGHT_ON_LEVEL
@@ -369,118 +338,6 @@ static const sh8601_lcd_init_cmd_t lcd_init_cmds[] = {
     #endif
 };
 
-#if CONFIG_VIEWE_UEDX46460015_MD50ET
-//***************The following code is for standardizing the event triggering of rotary encoders and buttons.**************** */
-//**************knob********* */
-extern void   LVGL_knob_event(void *event);
-
-extern void   LVGL_button_event(void *event);
-
-static knob_handle_t knob = NULL;
-
-const char *knob_event_table[] = {
-    "KNOB_LEFT",
-    "KNOB_RIGHT",
-    "KNOB_H_LIM",
-    "KNOB_L_LIM",
-    "KNOB_ZERO",
-};
-
-static void knob_event_cb(void *arg, void *data)
-{
-    ESP_LOGI(TAG, "knob event %s, %d", knob_event_table[(knob_event_t)data], iot_knob_get_count_value(knob));
-    LVGL_knob_event(data);
-   
-}
-
-void knob_init(uint32_t encoder_a, uint32_t encoder_b)
-{
-    knob_config_t cfg = {
-        .default_direction = 0,
-        .gpio_encoder_a = encoder_a,
-        .gpio_encoder_b = encoder_b,
-#if CONFIG_PM_ENABLE
-        .enable_power_save = true,
-#endif
-    };
-
-    knob = iot_knob_create(&cfg);
-    assert(knob);
-    esp_err_t err = iot_knob_register_cb(knob, KNOB_LEFT, knob_event_cb, (void *)KNOB_LEFT);
-    err |= iot_knob_register_cb(knob, KNOB_RIGHT, knob_event_cb, (void *)KNOB_RIGHT);
-    err |= iot_knob_register_cb(knob, KNOB_H_LIM, knob_event_cb, (void *)KNOB_H_LIM);
-    err |= iot_knob_register_cb(knob, KNOB_L_LIM, knob_event_cb, (void *)KNOB_L_LIM);
-    err |= iot_knob_register_cb(knob, KNOB_ZERO, knob_event_cb, (void *)KNOB_ZERO);
-    ESP_ERROR_CHECK(err);
-}
-
-//******************** */
-
-//*********Button**** */
-#if CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32H2 || CONFIG_IDF_TARGET_ESP32C6
-#define BOOT_BUTTON_NUM         9
-#else
-#define BOOT_BUTTON_NUM         0
-#endif
-#define BUTTON_ACTIVE_LEVEL     0
-const char *button_event_table[] = {
-    "BUTTON_PRESS_DOWN",
-    "BUTTON_PRESS_UP",
-    "BUTTON_PRESS_REPEAT",
-    "BUTTON_PRESS_REPEAT_DONE",
-    "BUTTON_SINGLE_CLICK",
-    "BUTTON_DOUBLE_CLICK",
-    "BUTTON_MULTIPLE_CLICK",
-    "BUTTON_LONG_PRESS_START",
-    "BUTTON_LONG_PRESS_HOLD",
-    "BUTTON_LONG_PRESS_UP",
-    "BUTTON_PRESS_END",
-};
-
-static void button_event_cb(void *arg, void *data)
-{
-    ESP_LOGI(TAG, "Button event %s", button_event_table[(button_event_t)data]);
-    LVGL_button_event(data);
-  
-  
-}
-void button_init(uint32_t button_num)
-{
-    button_config_t btn_cfg = {
-        .type = BUTTON_TYPE_GPIO,
-        .gpio_button_config = {
-            .gpio_num = button_num,
-            .active_level = BUTTON_ACTIVE_LEVEL,
-#if CONFIG_GPIO_BUTTON_SUPPORT_POWER_SAVE
-            .enable_power_save = true,
-#endif
-        },
-    };
-    button_handle_t btn = iot_button_create(&btn_cfg);
-    assert(btn);
-    esp_err_t err = iot_button_register_cb(btn, BUTTON_PRESS_DOWN, button_event_cb, (void *)BUTTON_PRESS_DOWN);
-    err |= iot_button_register_cb(btn, BUTTON_PRESS_UP, button_event_cb, (void *)BUTTON_PRESS_UP);
-    err |= iot_button_register_cb(btn, BUTTON_PRESS_REPEAT, button_event_cb, (void *)BUTTON_PRESS_REPEAT);
-    err |= iot_button_register_cb(btn, BUTTON_PRESS_REPEAT_DONE, button_event_cb, (void *)BUTTON_PRESS_REPEAT_DONE);
-    err |= iot_button_register_cb(btn, BUTTON_SINGLE_CLICK, button_event_cb, (void *)BUTTON_SINGLE_CLICK);
-    err |= iot_button_register_cb(btn, BUTTON_DOUBLE_CLICK, button_event_cb, (void *)BUTTON_DOUBLE_CLICK);
-    err |= iot_button_register_cb(btn, BUTTON_LONG_PRESS_START, button_event_cb, (void *)BUTTON_LONG_PRESS_START);
-    err |= iot_button_register_cb(btn, BUTTON_LONG_PRESS_HOLD, button_event_cb, (void *)BUTTON_LONG_PRESS_HOLD);
-    err |= iot_button_register_cb(btn, BUTTON_LONG_PRESS_UP, button_event_cb, (void *)BUTTON_LONG_PRESS_UP);
-    err |= iot_button_register_cb(btn, BUTTON_PRESS_END, button_event_cb, (void *)BUTTON_PRESS_END);
-
-#if CONFIG_ENTER_LIGHT_SLEEP_MODE_MANUALLY
-    /*!< For enter Power Save */
-    button_power_save_config_t config = {
-        .enter_power_save_cb = button_enter_power_save,
-    };
-    err |= iot_button_register_power_save_cb(&config);
-#endif
-
-    ESP_ERROR_CHECK(err);
-}
-#endif
-
 //*******main function********** */
 void app_main(void)
 {
@@ -635,10 +492,7 @@ void app_main(void)
 #if HF_ws2812
     led_strip = configure_led();
 #endif 
-#if CONFIG_VIEWE_UEDX46460015_MD50ET  
-    knob_init(BSP_ENCODER_A, BSP_ENCODER_B);
-    button_init(BSP_BTN_PRESS);
-#endif
+
     lvgl_mux = xSemaphoreCreateMutex();
     assert(lvgl_mux);
     xTaskCreate(example_lvgl_port_task, "LVGL", EXAMPLE_LVGL_TASK_STACK_SIZE, NULL, EXAMPLE_LVGL_TASK_PRIORITY, NULL);
