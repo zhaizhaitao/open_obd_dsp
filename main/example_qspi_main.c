@@ -30,6 +30,7 @@
 #include "esp_lcd_sh8601.h"
 #include "esp_lcd_touch_cst816s.h"
 #include "bsp_ble/ble_hidd_demo.h"
+#include "bsp_ble_host/esp_hid_host_demo.h"
 //***************** */
 
 // extern  esp_err_t lvgl_port_indev_init(void);
@@ -505,5 +506,6 @@ void app_main(void)
         example_lvgl_unlock();
     }
     //ble task build
-    app_hid_ctrl();
+    //app_hid_ctrl();
+    app_ble_host();//ble host
 }
