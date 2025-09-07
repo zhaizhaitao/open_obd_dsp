@@ -7,7 +7,11 @@
     "ui_helpers.h": "c",
     "ui_events.h": "c",
     "lvgl.h": "c",
-    "sdkconfig.h": "c"
+    "sdkconfig.h": "c",
+    "esp_hidd_prf_api.h": "c",
+    "led_strip.h": "c",
+    "ble_hidd_demo.h": "c",
+    "lv_demos.h": "c"
   },
   "idf.portWin": "COM3",
   "idf.flashType": "UART",

@@ -14,6 +14,8 @@ extern "C" {
 
 #include "ui_helpers.h"
 #include "ui_events.h"
+#include "bsp_ble/ble_hidd_demo.h"
+#include "esp_log.h"
 
 
 // SCREEN: ui_ScreenPageMain
@@ -46,6 +48,7 @@ LV_FONT_DECLARE(ui_font_FontTaikongSize32);
 
 // UI INIT
 void ui_init(void);
+void btn1_event_handler(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

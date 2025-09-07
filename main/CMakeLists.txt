@@ -8,6 +8,7 @@ idf_component_register(SRC_DIRS
                     "export_path/images"
                     "export_path/screens"
                     "export_path"
+                    "bsp_ble"   
                     INCLUDE_DIRS
                     ".")
 

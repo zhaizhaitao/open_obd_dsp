@@ -38,6 +38,22 @@ const lv_img_dsc_t * ui_imgset_pngmainback[2] = {&ui_img_pngmainback2_png, &ui_i
 
 ///////////////////// FUNCTIONS ////////////////////
 
+void btn1_event_handler(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+
+    if (sec_conn) {
+        if(code == LV_EVENT_PRESSING) {
+            esp_hidd_send_consumer_value(hid_conn_id, HID_CONSUMER_VOLUME_DOWN, true);
+            ESP_LOGI(HID_DEMO_TAG, "DOWN LV_EVENT_CLICKED");
+        }
+        else if(code == LV_EVENT_RELEASED) {
+            esp_hidd_send_consumer_value(hid_conn_id, HID_CONSUMER_VOLUME_DOWN, false);
+            ESP_LOGI(HID_DEMO_TAG, "DOWN LV_EVENT_RELEASED");
+        }
+    }
+}
+
 ///////////////////// SCREENS ////////////////////
 
 void ui_init(void)

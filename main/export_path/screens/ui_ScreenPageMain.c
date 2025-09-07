@@ -168,5 +168,8 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_style_text_opa(ui_LabelCarSpeedUnitText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LabelCarSpeedUnitText, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-
+    lv_obj_t * btn1 = lv_btn_create(ui_ScreenPageMain);
+    lv_obj_add_event_cb(btn1, btn1_event_handler, LV_EVENT_ALL, NULL);
+    lv_obj_align(btn1, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_size(btn1, 40, 40);
 }

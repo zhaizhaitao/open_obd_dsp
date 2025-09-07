@@ -29,7 +29,7 @@
 #include "esp_err.h"
 #include "esp_lcd_sh8601.h"
 #include "esp_lcd_touch_cst816s.h"
-
+#include "bsp_ble/ble_hidd_demo.h"
 //***************** */
 
 // extern  esp_err_t lvgl_port_indev_init(void);
@@ -501,12 +501,9 @@ void app_main(void)
     // Lock the mutex due to the LVGL APIs are not thread-safe
     if (example_lvgl_lock(-1)) {
         ui_init();
-        // lv_demo_widgets();      /* A widgets example */
-        //lv_demo_music();        /* A modern, smartphone-like music player demo. */
-        // lv_demo_stress();       /* A stress test for LVGL. */
-        // lv_demo_benchmark();    /* A demo to measure the performance of LVGL or to compare different settings. */
-       
         // Release the mutex
         example_lvgl_unlock();
     }
+    //ble task build
+    app_hid_ctrl();
 }
