@@ -14,7 +14,7 @@
     "lv_demos.h": "c",
     "elm327_ble_client.h": "c"
   },
-  "idf.portWin": "COM22",
+  "idf.portWin": "COM3",
   "idf.flashType": "UART",
   "idf.openOcdConfigs": [
     "board/esp32s3-builtin.cfg"
