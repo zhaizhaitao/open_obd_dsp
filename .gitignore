@@ -20,4 +20,5 @@
 !*.vscode
 !*.devcontainer
 build/
+managed_components/
 !*post_build.py
