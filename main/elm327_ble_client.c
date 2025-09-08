@@ -201,6 +201,7 @@ static void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_
         const esp_gatt_id_t *srvc_id = &param->search_res.srvc_id;
         if (srvc_id->uuid.len == ESP_UUID_LEN_16 && srvc_id->uuid.uuid.uuid16 == UUID16_OBD_SERVICE) {
             s_have_service = true;
+            ESP_LOGI(TAG, "Service FFF0 found");
             s_service_start = param->search_res.start_handle;
             s_service_end = param->search_res.end_handle;
         }
