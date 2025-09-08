@@ -233,8 +233,8 @@ static void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_
         s_char_notify_handle = s_char_write_handle; // 直接使用 FFF1 进行通知
 
         // 必须向协议栈注册通知回调，否则 ESP_GATTC_NOTIFY_EVT 不会上报
-        int ret = esp_ble_gattc_register_for_notify(gattc_if, s_peer_bda, s_char_notify_handle);
-        ESP_LOGI(TAG, "register_for_notify ret=%d", ret);
+        int  sret = esp_ble_gattc_register_for_notify(gattc_if, s_peer_bda, s_char_notify_handle);
+        ESP_LOGI(TAG, "register_for_notify ret=%d", sret);
 
         // 查找 CCCD 描述符
         if (s_char_notify_handle) {
