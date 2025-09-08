@@ -8,6 +8,7 @@
 #include "esp_bt_defs.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include "obd_data_cache.h"
 #include <string.h>
 
 // UUID 常量
@@ -37,8 +38,8 @@ static void default_on_raw_notify(const uint8_t *data, size_t len) {
     for (size_t i = 0; i < len; ++i) printf("%02X ", data[i]);
     printf("\n");
 }
-static void default_on_parsed_rpm(uint16_t rpm) { ESP_LOGI(TAG, "RPM: %u", rpm); }
-static void default_on_parsed_speed(uint8_t kmh) { ESP_LOGI(TAG, "SPEED: %u km/h", kmh); }
+static void default_on_parsed_rpm(uint16_t rpm) { ESP_LOGI(TAG, "RPM: %u", rpm); obd_data_set_rpm(rpm); }
+static void default_on_parsed_speed(uint8_t kmh) { ESP_LOGI(TAG, "SPEED: %u km/h", kmh); obd_data_set_speed(kmh); }
 
 static void obd_poll_task(void *arg) {
     vTaskDelay(pdMS_TO_TICKS(3000));

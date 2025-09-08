@@ -33,7 +33,12 @@ const lv_img_dsc_t * ui_imgset_pngmainback[2] = {&ui_img_pngmainback2_png, &ui_i
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 
-
+void my_timerMain(lv_timer_t * timer)
+{
+    ESP_LOGI("my_timerMain", "my_timerMain called");
+    lv_label_set_text_fmt(ui_LabelGeningRpmText, "%d", obd_data_get_rpm());
+    lv_label_set_text_fmt(ui_LabelCarSpeedText, "%d", obd_data_get_speed());
+}
 ///////////////////// ANIMATIONS ////////////////////
 
 ///////////////////// FUNCTIONS ////////////////////
@@ -65,4 +70,7 @@ void ui_init(void)
     ui_ScreenPageMain_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_ScreenPageMain);
+
+    lv_timer_t * timerMain;
+    timerMain = lv_timer_create(my_timerMain, 1000, NULL);  //第二个参数（周期）是以毫秒为单位
 }

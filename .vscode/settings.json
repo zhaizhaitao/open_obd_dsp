@@ -12,7 +12,8 @@
     "led_strip.h": "c",
     "ble_hidd_demo.h": "c",
     "lv_demos.h": "c",
-    "elm327_ble_client.h": "c"
+    "elm327_ble_client.h": "c",
+    "obd_data_cache.h": "c"
   },
   "idf.portWin": "COM3",
   "idf.flashType": "UART",
