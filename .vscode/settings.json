@@ -11,7 +11,8 @@
     "esp_hidd_prf_api.h": "c",
     "led_strip.h": "c",
     "ble_hidd_demo.h": "c",
-    "lv_demos.h": "c"
+    "lv_demos.h": "c",
+    "elm327_ble_client.h": "c"
   },
   "idf.portWin": "COM22",
   "idf.flashType": "UART",

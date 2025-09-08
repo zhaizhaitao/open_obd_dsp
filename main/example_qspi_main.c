@@ -32,6 +32,11 @@
 #include "bsp_ble/ble_hidd_demo.h"
 #include "bsp_ble_host/esp_hid_host_demo.h"
 //***************** */
+#include "elm327_ble_client.h"
+
+static const char *TAG = "example";
+
+// BLE OBD 的演示逻辑已封装到 elm327_ble_client.c 中
 
 // extern  esp_err_t lvgl_port_indev_init(void);
 
@@ -40,11 +45,7 @@
 #define CONFIG_VIEWE_SMARTRING            1
 #define CONFIG_LCD_TOUCH_ENABLED          1
 
-
-
 extern void ui_init(void);
-static const char *TAG = "example";
-
 static SemaphoreHandle_t lvgl_mux = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -499,13 +500,17 @@ void app_main(void)
     xTaskCreate(example_lvgl_port_task, "LVGL", EXAMPLE_LVGL_TASK_STACK_SIZE, NULL, EXAMPLE_LVGL_TASK_PRIORITY, NULL);
    
     ESP_LOGI(TAG, "Display LVGL demos");
+    gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL);//暂时关灯
     // Lock the mutex due to the LVGL APIs are not thread-safe
     if (example_lvgl_lock(-1)) {
         ui_init();
         // Release the mutex
         example_lvgl_unlock();
     }
-    //ble task build
-    //app_hid_ctrl();
-    app_ble_host();//ble host
+    
+    // 一键启动：默认日志与周期轮询（010C/010D）
+    elm327_ble_start_default("OBDII");
+
+    // 注意：原有 HID Host 可能与本 GATT 客户端同时占用 BLE 资源，如有冲突可暂时注释掉
+    // app_ble_host();//ble host
 }
