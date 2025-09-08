@@ -13,7 +13,7 @@
     "ble_hidd_demo.h": "c",
     "lv_demos.h": "c"
   },
-  "idf.portWin": "COM3",
+  "idf.portWin": "COM22",
   "idf.flashType": "UART",
   "idf.openOcdConfigs": [
     "board/esp32s3-builtin.cfg"
