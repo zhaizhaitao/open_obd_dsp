@@ -213,23 +213,43 @@ static void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_
             ESP_LOGW(TAG, "Service 0xFFF0 not found");
             break;
         }
+        ESP_LOGI(TAG, "Service discovery complete. Start char discovery.");
+
         // 通过 UUID 查询特征，兼容 IDF v5 API
         esp_bt_uuid_t uuid_write = { .len = ESP_UUID_LEN_16, .uuid = { .uuid16 = UUID16_OBD_WRITE_CHAR } };
         esp_gattc_char_elem_t char_elems[2];
-        uint16_t count = 0;
-        // 查写特征
-        if (esp_ble_gattc_get_char_by_uuid(gattc_if, s_conn_id, s_service_start, s_service_end, uuid_write, char_elems, &count) == ESP_OK && count > 0) {
-            s_char_write_handle = char_elems[0].char_handle;
+        uint16_t count = 2; // 【必须初始化】! 告诉函数数组的最大容量
+
+        // 查写特征 (0xFFF1)
+        esp_err_t ret = esp_ble_gattc_get_char_by_uuid(gattc_if, s_conn_id, s_service_start, s_service_end, uuid_write, char_elems, &count);
+        if (ret != ESP_OK) {
+            ESP_LOGE(TAG, "Get char by UUID failed: %s (0x%x)", esp_err_to_name(ret), ret);
+            break;
         }
+        if (count == 0) {
+            ESP_LOGE(TAG, "Characteristic 0xFFF1 not found!");
+            break;
+        }
+        s_char_write_handle = char_elems[0].char_handle;
+        ESP_LOGI(TAG, "Found char FFF1, handle: 0x%04X", s_char_write_handle);
+
         s_char_notify_handle = s_char_write_handle; // 直接使用 FFF1 进行通知
 
         // 查找 CCCD 描述符
         if (s_char_notify_handle) {
             esp_gattc_descr_elem_t descr_elems[2];
-            count = 0;
+            count = 2; // 【必须初始化】!
             esp_bt_uuid_t cccd_uuid = { .len = ESP_UUID_LEN_16, .uuid = { .uuid16 = UUID16_CCCD } };
-            if (esp_ble_gattc_get_descr_by_char_handle(gattc_if, s_conn_id, s_char_notify_handle, cccd_uuid, descr_elems, &count) == ESP_OK && count > 0) {
+            ret = esp_ble_gattc_get_descr_by_char_handle(gattc_if, s_conn_id, s_char_notify_handle, cccd_uuid, descr_elems, &count);
+            if (ret != ESP_OK) {
+                ESP_LOGE(TAG, "Get descr by char handle failed: %s (0x%x)", esp_err_to_name(ret), ret);
+                break;
+            }
+            if (count == 0) {
+                ESP_LOGW(TAG, "CCCD descriptor not found on handle 0x%04X. Notifications may not work.", s_char_notify_handle);
+            } else {
                 s_cccd_handle = descr_elems[0].handle;
+                ESP_LOGI(TAG, "Found CCCD descr, handle: 0x%04X", s_cccd_handle);
             }
         }
         enable_notify_if_ready();

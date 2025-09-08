@@ -35,9 +35,14 @@ const lv_img_dsc_t * ui_imgset_pngmainback[2] = {&ui_img_pngmainback2_png, &ui_i
 
 void my_timerMain(lv_timer_t * timer)
 {
-    ESP_LOGI("my_timerMain", "my_timerMain called");
-    lv_label_set_text_fmt(ui_LabelGeningRpmText, "%d", obd_data_get_rpm());
-    lv_label_set_text_fmt(ui_LabelCarSpeedText, "%d", obd_data_get_speed());
+    static uint16_t usRpm = 0;
+    static uint8_t ucSpeed = 0;
+    usRpm   = obd_data_get_rpm();
+    ucSpeed = obd_data_get_speed();
+    lv_label_set_text_fmt(ui_LabelGeningRpmText, "%d", usRpm);
+    lv_label_set_text_fmt(ui_LabelCarSpeedText, "%d", ucSpeed);
+    lv_arc_set_value(ui_ArcGeningRpm, (uint32_t)usRpm*100/7000);
+    lv_arc_set_value(ui_ArcCarSpeed, (uint16_t)ucSpeed*100/200);
 }
 ///////////////////// ANIMATIONS ////////////////////
 
