@@ -128,19 +128,16 @@ bool elm327_ble_send_command(const uint8_t *data, size_t len) {
     return err == ESP_OK;
 }
 
+// 将 ASCII 指令(如 "01 0C\r")复制到输出缓冲区，同时去除空白字符，保持 ELM327 所需的 ASCII 格式
 size_t elm327_ble_ascii_cmd_to_bytes(const char *ascii, uint8_t *out_buf, size_t out_buf_len) {
     size_t out = 0;
     const char *p = ascii;
     while (*p && out < out_buf_len) {
-        while (*p == ' ' || *p == '\t') p++;
-        if (*p == '\0') break;
-        if (*(p+1) == '\0') break;
-        char hex[3] = {p[0], p[1], 0};
-        uint8_t v = (uint8_t)strtoul(hex, NULL, 16);
-        out_buf[out++] = v;
-        p += 2;
-        while (*p == ' ' || *p == '\t') p++;
-        if (*p == '\r') { if (out < out_buf_len) out_buf[out++] = '\r'; p++; break; }
+        if (*p == ' ' || *p == '\t') {
+            p++;                // 跳过空白符
+            continue;
+        }
+        out_buf[out++] = (uint8_t)(*p++); // 直接复制 ASCII 字节
     }
     return out;
 }
@@ -234,6 +231,10 @@ static void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_
         ESP_LOGI(TAG, "Found char FFF1, handle: 0x%04X", s_char_write_handle);
 
         s_char_notify_handle = s_char_write_handle; // 直接使用 FFF1 进行通知
+
+        // 必须向协议栈注册通知回调，否则 ESP_GATTC_NOTIFY_EVT 不会上报
+        int ret = esp_ble_gattc_register_for_notify(gattc_if, s_peer_bda, s_char_notify_handle);
+        ESP_LOGI(TAG, "register_for_notify ret=%d", ret);
 
         // 查找 CCCD 描述符
         if (s_char_notify_handle) {
