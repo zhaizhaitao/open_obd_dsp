@@ -36,6 +36,7 @@ static void default_on_disconnected(void) { ESP_LOGI(TAG, "OBD BLE disconnected"
 static void default_on_raw_notify(const uint8_t *data, size_t len) {
     ESP_LOGI(TAG, "RAW (%d):", (int)len);
     for (size_t i = 0; i < len; ++i) printf("%02X ", data[i]);
+    printf("  str: %s", data);
     printf("\n");
 }
 static void default_on_parsed_rpm(uint16_t rpm) { ESP_LOGI(TAG, "RPM: %u", rpm); obd_data_set_rpm(rpm); }
@@ -56,15 +57,16 @@ static void obd_poll_task(void *arg) {
         tick_count++;
         
         // 转速/车速 - 200ms 查询一次
-        if (tick_count % 1 == 0) { // 每200ms执行
+        //if (tick_count % 1 == 0)
+         { // 每200ms执行
             size_t n = elm327_ble_ascii_cmd_to_bytes("01 0C\r", buf, sizeof(buf));
             if (n) { elm327_ble_send_command(buf, n); }
-            vTaskDelay(pdMS_TO_TICKS(50));
+            vTaskDelay(pdMS_TO_TICKS(1000));
             n = elm327_ble_ascii_cmd_to_bytes("01 0D\r", buf, sizeof(buf));
             if (n) { elm327_ble_send_command(buf, n); }
-            vTaskDelay(pdMS_TO_TICKS(50));
+            vTaskDelay(pdMS_TO_TICKS(1000));
         }
-        
+    #if 0    
         // 绝对压力和节气门位置 - 1s 查询一次
         if (tick_count % 5 == 0) { // 每1s执行
             size_t n = elm327_ble_ascii_cmd_to_bytes("01 10\r", buf, sizeof(buf));
@@ -93,6 +95,7 @@ static void obd_poll_task(void *arg) {
             if (n) { elm327_ble_send_command(buf, n); }
             vTaskDelay(pdMS_TO_TICKS(50));
         }
+        #endif
         vTaskDelay(pdMS_TO_TICKS(200)); // 基础周期200ms
     }
 }
@@ -317,7 +320,7 @@ static void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_
         else if (n >= 6 && v[0] == '4' && v[1] == '1') { // ASCII格式: "41 0C 1B F8"   新增ASCII格式解析
             // 定义足够大的数据数组
             #define MAX_DATA_BYTES 6  // 大多数OBD响应不超过6个字节
-            uint32_t data[MAX_DATA_BYTES] = {0};
+            uint8_t data[MAX_DATA_BYTES] = {0};
             char response[128] = {0};
             memcpy(response, v, n < 127 ? n : 127);// 解析响应  
             // 解析ASCII格式的OBD响应
@@ -326,61 +329,62 @@ static void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_
                 &mode, &pid, 
                 &data[0], &data[1], &data[2], &data[3], 
                 &data[4], &data[5]);
-            
+                ESP_LOGI(TAG, "response: %s,mode: %x,pid: %x,data: %x %x %x %x %x %x", response, mode, pid , data[0], data[1], data[2], data[3], data[4], data[5] );
+
             if (values >= 3 && mode == 0x41) {
                 int data_count = values - 2; // 减去mode和pid
                 ESP_LOGI(TAG, "PID 0x%02X with %d data bytes", pid, data_count);
                 switch (pid) {
                     case 0x05: // 发动机冷却液温度
-                        if (data_count >= 4 && s_cbs.on_parsed_coolant_temp) {
+                        if (data_count >= 2 && s_cbs.on_parsed_coolant_temp) {
                             uint32_t temp = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
                             s_cbs.on_parsed_coolant_temp(temp - 40); // 转换为摄氏度
                             ESP_LOGI(TAG, "ASCII COOLANT TEMP: %u °C", temp - 40);
                         }
                         break;
                     case 0x0C: // 转速
-                        if (data_count >= 4 && s_cbs.on_parsed_rpm) {
+                        if (data_count >= 2 && s_cbs.on_parsed_rpm) {
                             uint16_t rpm = ((data[0] << 8) | data[1]) / 4;
                             s_cbs.on_parsed_rpm(rpm);
                             ESP_LOGI(TAG, "ASCII RPM: %u", rpm);
                         }
                         break;
                     case 0x0D: // 车速
-                        if (data_count >= 3 && s_cbs.on_parsed_speed_kmh) {
+                        if (data_count >= 1 && s_cbs.on_parsed_speed_kmh) {
                             s_cbs.on_parsed_speed_kmh(data[0]);
                             ESP_LOGI(TAG, "ASCII Speed: %u km/h", data[0]);
                         }
                         break;
                     case 0x0F: // 进气温度
-                        if (data_count >= 4 && s_cbs.on_parsed_intake_temp) {
+                        if (data_count >= 2 && s_cbs.on_parsed_intake_temp) {
                             uint32_t temp = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
                             s_cbs.on_parsed_intake_temp(temp - 40); // 转换为摄氏度
                             ESP_LOGI(TAG, "ASCII INTAKE TEMP: %u °C", temp - 40);
                         }
                         break;
                     case 0x0B: // 进气歧管绝对压力
-                        if (data_count >= 4 && s_cbs.on_parsed_manifold_pressure) {
+                        if (data_count >= 2 && s_cbs.on_parsed_manifold_pressure) {
                             uint32_t pressure = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
                             s_cbs.on_parsed_manifold_pressure(pressure);
                             ESP_LOGI(TAG, "ASCII MANIFOLD PRESSURE: %u kPa", pressure);
                         }
                         break;
                     case 0x11: // 节气门位置
-                        if (data_count >= 4 && s_cbs.on_parsed_throttle_position) {
+                        if (data_count >= 2 && s_cbs.on_parsed_throttle_position) {
                             uint32_t position = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
                             s_cbs.on_parsed_throttle_position(position);
                             ESP_LOGI(TAG, "ASCII THROTTLE POSITION: %u %", position);
                         }
                         break;
                     case 0x2F: // 燃油液位
-                        if (data_count >= 4 && s_cbs.on_parsed_fuel_level) {
+                        if (data_count >= 2 && s_cbs.on_parsed_fuel_level) {
                             uint32_t level = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
                             s_cbs.on_parsed_fuel_level(level);
                             ESP_LOGI(TAG, "ASCII FUEL LEVEL: %u %", level);
                         }
                         break;
                     case 0x42: // 控制模块电压
-                        if (data_count >= 4 && s_cbs.on_parsed_control_module_voltage) {
+                        if (data_count >= 2 && s_cbs.on_parsed_control_module_voltage) {
                             uint32_t voltage = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
                             s_cbs.on_parsed_control_module_voltage(voltage);
                             ESP_LOGI(TAG, "ASCII CONTROL MODULE VOLTAGE: %u V", voltage);
