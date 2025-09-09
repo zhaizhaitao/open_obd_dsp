@@ -510,7 +510,4 @@ void app_main(void)
     
     // 一键启动：默认日志与周期轮询（010C/010D）
     elm327_ble_start_default("OBDII");
-
-    // 注意：原有 HID Host 可能与本 GATT 客户端同时占用 BLE 资源，如有冲突可暂时注释掉
-    // app_ble_host();//ble host
 }

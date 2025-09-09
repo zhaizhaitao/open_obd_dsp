@@ -40,17 +40,60 @@ static void default_on_raw_notify(const uint8_t *data, size_t len) {
 }
 static void default_on_parsed_rpm(uint16_t rpm) { ESP_LOGI(TAG, "RPM: %u", rpm); obd_data_set_rpm(rpm); }
 static void default_on_parsed_speed(uint8_t kmh) { ESP_LOGI(TAG, "SPEED: %u km/h", kmh); obd_data_set_speed(kmh); }
-
+static void default_on_parsed_coolant_temp(uint32_t coolant_temp) { ESP_LOGI(TAG, "COOLANT TEMP: %u °C", coolant_temp); }
+static void default_on_parsed_intake_temp(uint32_t intake_temp) { ESP_LOGI(TAG, "INTAKE TEMP: %u °C", intake_temp); }
+static void default_on_parsed_manifold_pressure(uint32_t manifold_pressure) { ESP_LOGI(TAG, "MANIFOLD PRESSURE: %u kPa", manifold_pressure); }
+static void default_on_parsed_control_module_voltage(uint32_t control_module_voltage) { ESP_LOGI(TAG, "CONTROL MODULE VOLTAGE: %u V", control_module_voltage); }
+static void default_on_parsed_fuel_level(uint32_t fuel_level) { ESP_LOGI(TAG, "FUEL LEVEL: %u %", fuel_level); }
+static void default_on_parsed_throttle_position(uint32_t throttle_position) { ESP_LOGI(TAG, "THROTTLE POSITION: %u %", throttle_position); }
+ 
 static void obd_poll_task(void *arg) {
-    vTaskDelay(pdMS_TO_TICKS(3000));
+    vTaskDelay(pdMS_TO_TICKS(3000)); // 等待连接建立
     uint8_t buf[16];
+    uint32_t tick_count = 0;
+    
     while (1) {
-        size_t n = elm327_ble_ascii_cmd_to_bytes("01 0C\r", buf, sizeof(buf));
-        if (n) { elm327_ble_send_command(buf, n); }
-        vTaskDelay(pdMS_TO_TICKS(500));
-        n = elm327_ble_ascii_cmd_to_bytes("01 0D\r", buf, sizeof(buf));
-        if (n) { elm327_ble_send_command(buf, n); }
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        tick_count++;
+        
+        // 转速/车速 - 200ms 查询一次
+        if (tick_count % 1 == 0) { // 每200ms执行
+            size_t n = elm327_ble_ascii_cmd_to_bytes("01 0C\r", buf, sizeof(buf));
+            if (n) { elm327_ble_send_command(buf, n); }
+            vTaskDelay(pdMS_TO_TICKS(50));
+            n = elm327_ble_ascii_cmd_to_bytes("01 0D\r", buf, sizeof(buf));
+            if (n) { elm327_ble_send_command(buf, n); }
+            vTaskDelay(pdMS_TO_TICKS(50));
+        }
+        
+        // 绝对压力和节气门位置 - 1s 查询一次
+        if (tick_count % 5 == 0) { // 每1s执行
+            size_t n = elm327_ble_ascii_cmd_to_bytes("01 10\r", buf, sizeof(buf));
+            if (n) { elm327_ble_send_command(buf, n); }
+            vTaskDelay(pdMS_TO_TICKS(50));
+            n = elm327_ble_ascii_cmd_to_bytes("01 11\r", buf, sizeof(buf));
+            if (n) { elm327_ble_send_command(buf, n); }
+            vTaskDelay(pdMS_TO_TICKS(50));
+        }
+        
+        // 冷却液温度/进气温度/控制模块电压 - 5s 查询一次
+        if (tick_count % 25 == 0) { // 每5s执行
+            size_t n = elm327_ble_ascii_cmd_to_bytes("01 05\r", buf, sizeof(buf));
+            if (n) { elm327_ble_send_command(buf, n); }
+            vTaskDelay(pdMS_TO_TICKS(50));
+            n = elm327_ble_ascii_cmd_to_bytes("01 0F\r", buf, sizeof(buf));
+            if (n) { elm327_ble_send_command(buf, n); }
+            vTaskDelay(pdMS_TO_TICKS(50));
+            n = elm327_ble_ascii_cmd_to_bytes("01 42\r", buf, sizeof(buf));
+            if (n) { elm327_ble_send_command(buf, n); }
+            vTaskDelay(pdMS_TO_TICKS(50));
+        }  
+        // 燃油液位 - 10s 查询一次
+        if (tick_count % 50 == 0) { // 每10s执行
+            size_t n = elm327_ble_ascii_cmd_to_bytes("01 2F\r", buf, sizeof(buf));
+            if (n) { elm327_ble_send_command(buf, n); }
+            vTaskDelay(pdMS_TO_TICKS(50));
+        }
+        vTaskDelay(pdMS_TO_TICKS(200)); // 基础周期200ms
     }
 }
 
@@ -266,17 +309,95 @@ static void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_
     }
     case ESP_GATTC_NOTIFY_EVT: {
         if (s_cbs.on_raw_notify) s_cbs.on_raw_notify(param->notify.value, param->notify.value_len);
-        // 简单解析 OBD-II：010C RPM，010D 速度（ELM 返回 ASCII 帧也可能存在，这里假设是已二进制转义或直传数据）
-        // 常见形式：41 0C AA BB  -> RPM = ((AA*256)+BB)/4
-        //         ：41 0D AA     -> SPEED = AA
         const uint8_t *v = param->notify.value;
         int n = param->notify.value_len;
         if (n >= 3 && v[0] == 0x41) {
-            if (v[1] == 0x0C && n >= 4 && s_cbs.on_parsed_rpm) {
-                uint16_t raw = ((uint16_t)v[2] << 8) | v[3];
-                s_cbs.on_parsed_rpm(raw / 4);
-            } else if (v[1] == 0x0D && n >= 3 && s_cbs.on_parsed_speed_kmh) {
-                s_cbs.on_parsed_speed_kmh(v[2]);
+            ESP_LOGW(TAG, "OBD responded in binary format!!!");
+        }
+        else if (n >= 6 && v[0] == '4' && v[1] == '1') { // ASCII格式: "41 0C 1B F8"   新增ASCII格式解析
+            // 定义足够大的数据数组
+            #define MAX_DATA_BYTES 6  // 大多数OBD响应不超过6个字节
+            uint32_t data[MAX_DATA_BYTES] = {0};
+            char response[128] = {0};
+            memcpy(response, v, n < 127 ? n : 127);// 解析响应  
+            // 解析ASCII格式的OBD响应
+            uint8_t mode, pid;
+            int values = sscanf(response, "%x %x %x %x %x %x %x %x", 
+                &mode, &pid, 
+                &data[0], &data[1], &data[2], &data[3], 
+                &data[4], &data[5]);
+            
+            if (values >= 3 && mode == 0x41) {
+                int data_count = values - 2; // 减去mode和pid
+                ESP_LOGI(TAG, "PID 0x%02X with %d data bytes", pid, data_count);
+                switch (pid) {
+                    case 0x05: // 发动机冷却液温度
+                        if (data_count >= 4 && s_cbs.on_parsed_coolant_temp) {
+                            uint32_t temp = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
+                            s_cbs.on_parsed_coolant_temp(temp - 40); // 转换为摄氏度
+                            ESP_LOGI(TAG, "ASCII COOLANT TEMP: %u °C", temp - 40);
+                        }
+                        break;
+                    case 0x0C: // 转速
+                        if (data_count >= 4 && s_cbs.on_parsed_rpm) {
+                            uint16_t rpm = ((data[0] << 8) | data[1]) / 4;
+                            s_cbs.on_parsed_rpm(rpm);
+                            ESP_LOGI(TAG, "ASCII RPM: %u", rpm);
+                        }
+                        break;
+                    case 0x0D: // 车速
+                        if (data_count >= 3 && s_cbs.on_parsed_speed_kmh) {
+                            s_cbs.on_parsed_speed_kmh(data[0]);
+                            ESP_LOGI(TAG, "ASCII Speed: %u km/h", data[0]);
+                        }
+                        break;
+                    case 0x0F: // 进气温度
+                        if (data_count >= 4 && s_cbs.on_parsed_intake_temp) {
+                            uint32_t temp = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
+                            s_cbs.on_parsed_intake_temp(temp - 40); // 转换为摄氏度
+                            ESP_LOGI(TAG, "ASCII INTAKE TEMP: %u °C", temp - 40);
+                        }
+                        break;
+                    case 0x0B: // 进气歧管绝对压力
+                        if (data_count >= 4 && s_cbs.on_parsed_manifold_pressure) {
+                            uint32_t pressure = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
+                            s_cbs.on_parsed_manifold_pressure(pressure);
+                            ESP_LOGI(TAG, "ASCII MANIFOLD PRESSURE: %u kPa", pressure);
+                        }
+                        break;
+                    case 0x11: // 节气门位置
+                        if (data_count >= 4 && s_cbs.on_parsed_throttle_position) {
+                            uint32_t position = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
+                            s_cbs.on_parsed_throttle_position(position);
+                            ESP_LOGI(TAG, "ASCII THROTTLE POSITION: %u %", position);
+                        }
+                        break;
+                    case 0x2F: // 燃油液位
+                        if (data_count >= 4 && s_cbs.on_parsed_fuel_level) {
+                            uint32_t level = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
+                            s_cbs.on_parsed_fuel_level(level);
+                            ESP_LOGI(TAG, "ASCII FUEL LEVEL: %u %", level);
+                        }
+                        break;
+                    case 0x42: // 控制模块电压
+                        if (data_count >= 4 && s_cbs.on_parsed_control_module_voltage) {
+                            uint32_t voltage = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
+                            s_cbs.on_parsed_control_module_voltage(voltage);
+                            ESP_LOGI(TAG, "ASCII CONTROL MODULE VOLTAGE: %u V", voltage);
+                        }
+                        break;
+                }
+            }
+        }
+        // 3. 处理其他响应（如"NO DATA"）
+        else {
+            // 检查是否是"NO DATA"等文本响应
+            char response[64] = {0};
+            memcpy(response, v, n < 63 ? n : 63);
+            if (strstr(response, "NO DATA") != NULL) {
+                ESP_LOGW(TAG, "OBD responded: NO DATA");
+            } else if (strstr(response, "SEARCHING") != NULL) {
+                ESP_LOGI(TAG, "OBD is searching for protocol...");
             }
         }
         break;
@@ -305,6 +426,7 @@ static void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_
 
 void elm327_ble_start_default(const char *target_name) {
 
+    // 初始化 NVS 
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
@@ -318,6 +440,12 @@ void elm327_ble_start_default(const char *target_name) {
         .on_raw_notify = default_on_raw_notify,
         .on_parsed_rpm = default_on_parsed_rpm,
         .on_parsed_speed_kmh = default_on_parsed_speed,
+        .on_parsed_coolant_temp = default_on_parsed_coolant_temp,
+        .on_parsed_intake_temp = default_on_parsed_intake_temp,
+        .on_parsed_manifold_pressure = default_on_parsed_manifold_pressure,
+        .on_parsed_control_module_voltage = default_on_parsed_control_module_voltage,
+        .on_parsed_fuel_level = default_on_parsed_fuel_level,
+        .on_parsed_throttle_position = default_on_parsed_throttle_position,
     };
     elm327_ble_init_and_start(target_name, &cbs);
     xTaskCreate(obd_poll_task, "obd_poll", 3072, NULL, 4, NULL);
