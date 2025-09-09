@@ -80,7 +80,7 @@ static void obd_poll_task(void *arg) {
     while (1) {
         tick_count++;
         
-        // 转速/车速 - 200ms 查询一次
+        // 转速/车速 - 1000ms 查询一次
          if (tick_count % (1000 / 200) == 0)/*1s*/
          { // 每200ms执行
             size_t n = elm327_ble_ascii_cmd_to_bytes("01 0C\r", buf, sizeof(buf));

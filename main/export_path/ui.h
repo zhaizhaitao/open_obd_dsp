@@ -19,6 +19,10 @@ extern "C" {
 #include "obd_data_cache.h"
 
 
+void ui_ScreenPageLogo_screen_init(void);
+extern lv_obj_t * ui_ScreenPageLogo;
+extern lv_obj_t * gif_logo;
+
 // SCREEN: ui_ScreenPageMain
 void ui_ScreenPageMain_screen_init(void);
 extern lv_obj_t * ui_ScreenPageMain;
@@ -38,7 +42,8 @@ extern lv_obj_t * ui_LabelCarSpeedUnitText;
 // EVENTS
 
 extern lv_obj_t * ui____initial_actions0;
-
+LV_IMG_DECLARE(gifBlueLightLogo);    
+LV_IMG_DECLARE(gifSnake400);  
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(ui_img_pngmainback3_png);    // assets/pngMainBack3.png
 LV_IMG_DECLARE(ui_img_pngmainback2_png);    // assets/pngMainBack2.png
@@ -50,6 +55,7 @@ LV_FONT_DECLARE(ui_font_FontTaikongSize32);
 // UI INIT
 void ui_init(void);
 void btn1_event_handler(lv_event_t * e);
+void ui_event_logo_background(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

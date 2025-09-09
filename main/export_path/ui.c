@@ -6,8 +6,12 @@
 #include "ui.h"
 #include "ui_helpers.h"
 
-///////////////////// VARIABLES ////////////////////
 
+static const char *TAG = "ui";
+///////////////////// VARIABLES ////////////////////
+void ui_ScreenPageLogo_screen_init(void);
+lv_obj_t * ui_ScreenPageLogo;
+lv_obj_t * gif_logo;
 
 // SCREEN: ui_ScreenPageMain
 void ui_ScreenPageMain_screen_init(void);
@@ -48,20 +52,26 @@ void my_timerMain(lv_timer_t * timer)
 
 ///////////////////// FUNCTIONS ////////////////////
 
+
+
+///////////////////// FUNCTIONS ////////////////////
+void ui_event_logo_background(lv_event_t * e)
+{  
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if(event_code == LV_EVENT_CLICKED) {//触摸点击
+        ESP_LOGI(TAG, "Logo LV_EVENT_CLICKED ! \n");
+
+        _ui_screen_change(&ui_ScreenPageMain, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageMain_screen_init);  
+        lv_obj_del(gif_logo); //一定要手动删除gif，切换页面不会删除gif，不然占用资源
+    }   
+}
+
 void btn1_event_handler(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
-
-    if (sec_conn) {
-        if(code == LV_EVENT_PRESSING) {
-            esp_hidd_send_consumer_value(hid_conn_id, HID_CONSUMER_VOLUME_DOWN, true);
-            ESP_LOGI(HID_DEMO_TAG, "DOWN LV_EVENT_CLICKED");
-        }
-        else if(code == LV_EVENT_RELEASED) {
-            esp_hidd_send_consumer_value(hid_conn_id, HID_CONSUMER_VOLUME_DOWN, false);
-            ESP_LOGI(HID_DEMO_TAG, "DOWN LV_EVENT_RELEASED");
-        }
-    }
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if(event_code == LV_EVENT_CLICKED) {//触摸点击
+        ESP_LOGI(TAG, "Main LV_EVENT_CLICKED ! \n");
+    }  
 }
 
 ///////////////////// SCREENS ////////////////////
@@ -72,10 +82,11 @@ void ui_init(void)
     lv_theme_t * theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
                                                false, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
+    ui_ScreenPageLogo_screen_init();
     ui_ScreenPageMain_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
-    lv_disp_load_scr(ui_ScreenPageMain);
+    lv_disp_load_scr(ui_ScreenPageLogo);
 
     lv_timer_t * timerMain;
-    timerMain = lv_timer_create(my_timerMain, 1000, NULL);  //第二个参数（周期）是以毫秒为单位
+    timerMain = lv_timer_create(my_timerMain, 200, NULL);  //第二个参数（周期）是以毫秒为单位
 }
