@@ -48,7 +48,14 @@ static void default_on_parsed_fuel_level(uint32_t fuel_level) { ESP_LOGI(TAG, "F
 static void default_on_parsed_throttle_position(uint32_t throttle_position) { ESP_LOGI(TAG, "THROTTLE POSITION: %u %", throttle_position); }
  
 static void obd_poll_task(void *arg) {
-    vTaskDelay(pdMS_TO_TICKS(3000)); // 等待连接建立
+    for(;;){
+        if(s_connected)
+        {
+            break;
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+    vTaskDelay(pdMS_TO_TICKS(1000)); // 等待连接建立
     uint8_t buf[16];
     uint32_t tick_count = 0;
     // 初始化阶段：发送 ELM327 AT 指令
@@ -59,8 +66,8 @@ static void obd_poll_task(void *arg) {
         "ATS1\r",     // 空格 on/off
         "ATH0\r",     // 关闭头部数据（可选）ATH1是打開
         "ATAT1\r",    // 适应时序
-        "ATST 32\r",  // 设置超时（4*50=200ms，可按车况调 默認200ms） 这个后面改小/大试试；
-        "ATSP0\r",  //ATSP = Set Protocol（设置 OBD 协议） 0是自动 后面可以换一下试试6
+        "ATST 19\r",  // 设置超时（4*50=200ms，可按车况调 默認200ms） 这个后面改小/大试试；
+        "ATSP4\r",  //ATSP = Set Protocol（设置 OBD 协议） 0是自动 后面可以换一下试试 3ok 4ok效果好
     };
 
     for (size_t i = 0; i < (sizeof(init_cmds) / sizeof(init_cmds[0])); ++i) {
@@ -81,20 +88,24 @@ static void obd_poll_task(void *arg) {
         tick_count++;
         
         // 转速/车速 - 1000ms 查询一次
-         if (tick_count % (1000 / 200) == 0)/*1s*/
+         if (tick_count % (400 / 200) == 0)/*1s*/
          { // 每200ms执行
             size_t n = elm327_ble_ascii_cmd_to_bytes("01 0C\r", buf, sizeof(buf));
             if (n) { elm327_ble_send_command(buf, n); }
+            ESP_LOGI(TAG, "send 01 0C\r");
             vTaskDelay(pdMS_TO_TICKS(100));
-            // n = elm327_ble_ascii_cmd_to_bytes("01 0D\r", buf, sizeof(buf));
-            // if (n) { elm327_ble_send_command(buf, n); }
-            // vTaskDelay(pdMS_TO_TICKS(1000));
+             n = elm327_ble_ascii_cmd_to_bytes("01 0D\r", buf, sizeof(buf));
+             if (n) { elm327_ble_send_command(buf, n); }
+             ESP_LOGI(TAG, "send 01 0D\r");
+    
         }
 
-        if (tick_count % (5000 / 200) == 0)/*5s*/
+        if (tick_count % (1400 / 200) == 0)/*5s*/
          { // 每200ms执行
-            size_t n = elm327_ble_ascii_cmd_to_bytes("01 00\r", buf, sizeof(buf));
+            vTaskDelay(pdMS_TO_TICKS(100));
+            size_t n = elm327_ble_ascii_cmd_to_bytes("3E 00\r", buf, sizeof(buf));
             if (n) { elm327_ble_send_command(buf, n); }
+            ESP_LOGI(TAG, "send 3E 00\r");
          }
 
 

@@ -15,7 +15,7 @@
     "elm327_ble_client.h": "c",
     "obd_data_cache.h": "c"
   },
-  "idf.portWin": "COM22",
+  "idf.portWin": "COM3",
   "idf.flashType": "UART",
   "idf.openOcdConfigs": [
     "board/esp32s3-builtin.cfg"
