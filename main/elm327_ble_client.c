@@ -36,8 +36,7 @@ static void default_on_disconnected(void) { ESP_LOGI(TAG, "OBD BLE disconnected"
 static void default_on_raw_notify(const uint8_t *data, size_t len) {
     ESP_LOGI(TAG, "RAW (%d):", (int)len);
     for (size_t i = 0; i < len; ++i) printf("%02X ", data[i]);
-    printf("  str: %s", data);
-    printf("\n");
+    printf("str: %s \n", data);
 }
 static void default_on_parsed_rpm(uint16_t rpm) { ESP_LOGI(TAG, "RPM: %u", rpm); obd_data_set_rpm(rpm); }
 static void default_on_parsed_speed(uint8_t kmh) { ESP_LOGI(TAG, "SPEED: %u km/h", kmh); obd_data_set_speed(kmh); }
@@ -52,20 +51,53 @@ static void obd_poll_task(void *arg) {
     vTaskDelay(pdMS_TO_TICKS(3000)); // 等待连接建立
     uint8_t buf[16];
     uint32_t tick_count = 0;
-    
+    // 初始化阶段：发送 ELM327 AT 指令
+    const char *init_cmds[] = {
+        "ATZ\r",      // 复位
+        "ATE0\r",     // Echo off
+        "ATL0\r",     // 行宽 off
+        "ATS1\r",     // 空格 on/off
+        "ATH0\r",     // 关闭头部数据（可选）ATH1是打開
+        "ATAT1\r",    // 适应时序
+        "ATST 32\r",  // 设置超时（4*50=200ms，可按车况调 默認200ms） 这个后面改小/大试试；
+        "ATSP0\r",  //ATSP = Set Protocol（设置 OBD 协议） 0是自动 后面可以换一下试试6
+    };
+
+    for (size_t i = 0; i < (sizeof(init_cmds) / sizeof(init_cmds[0])); ++i) {
+        size_t n = elm327_ble_ascii_cmd_to_bytes(init_cmds[i], buf, sizeof(buf));
+        if (n) { elm327_ble_send_command(buf, n); }
+        ESP_LOGI(TAG, " AT init Cmd send %s",init_cmds[i]);
+        vTaskDelay(pdMS_TO_TICKS(i == 0 ? 2000 : 100)); // ATZ 后多等一会
+    }
+
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    // 协议选择后做一次能力探测，加速稳定
+    size_t n2 = elm327_ble_ascii_cmd_to_bytes("01 00\r", buf, sizeof(buf));
+    if (n2) { elm327_ble_send_command(buf, n2); }
+    ESP_LOGI(TAG, " CMD 01 00 send \n");
+    vTaskDelay(pdMS_TO_TICKS(100));
+
     while (1) {
         tick_count++;
         
         // 转速/车速 - 200ms 查询一次
-        //if (tick_count % 1 == 0)
+         if (tick_count % (1000 / 200) == 0)/*1s*/
          { // 每200ms执行
             size_t n = elm327_ble_ascii_cmd_to_bytes("01 0C\r", buf, sizeof(buf));
             if (n) { elm327_ble_send_command(buf, n); }
-            vTaskDelay(pdMS_TO_TICKS(1000));
-            n = elm327_ble_ascii_cmd_to_bytes("01 0D\r", buf, sizeof(buf));
-            if (n) { elm327_ble_send_command(buf, n); }
-            vTaskDelay(pdMS_TO_TICKS(1000));
+            vTaskDelay(pdMS_TO_TICKS(100));
+            // n = elm327_ble_ascii_cmd_to_bytes("01 0D\r", buf, sizeof(buf));
+            // if (n) { elm327_ble_send_command(buf, n); }
+            // vTaskDelay(pdMS_TO_TICKS(1000));
         }
+
+        if (tick_count % (5000 / 200) == 0)/*5s*/
+         { // 每200ms执行
+            size_t n = elm327_ble_ascii_cmd_to_bytes("01 00\r", buf, sizeof(buf));
+            if (n) { elm327_ble_send_command(buf, n); }
+         }
+
+
     #if 0    
         // 绝对压力和节气门位置 - 1s 查询一次
         if (tick_count % 5 == 0) { // 每1s执行
@@ -95,7 +127,7 @@ static void obd_poll_task(void *arg) {
             if (n) { elm327_ble_send_command(buf, n); }
             vTaskDelay(pdMS_TO_TICKS(50));
         }
-        #endif
+    #endif
         vTaskDelay(pdMS_TO_TICKS(200)); // 基础周期200ms
     }
 }
@@ -314,10 +346,13 @@ static void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_
         if (s_cbs.on_raw_notify) s_cbs.on_raw_notify(param->notify.value, param->notify.value_len);
         const uint8_t *v = param->notify.value;
         int n = param->notify.value_len;
-        if (n >= 3 && v[0] == 0x41) {
+        
+        if (n >= 3 && v[0] == 0x41) 
+        {
             ESP_LOGW(TAG, "OBD responded in binary format!!!");
         }
-        else if (n >= 6 && v[0] == '4' && v[1] == '1') { // ASCII格式: "41 0C 1B F8"   新增ASCII格式解析
+        else if (n >= 6 && v[0] == '4' && v[1] == '1')
+        { // ASCII格式: "41 0C 1B F8"   新增ASCII格式解析
             // 定义足够大的数据数组
             #define MAX_DATA_BYTES 6  // 大多数OBD响应不超过6个字节
             uint8_t data[MAX_DATA_BYTES] = {0};
@@ -331,7 +366,8 @@ static void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_
                 &data[4], &data[5]);
                 ESP_LOGI(TAG, "response: %s,mode: %x,pid: %x,data: %x %x %x %x %x %x", response, mode, pid , data[0], data[1], data[2], data[3], data[4], data[5] );
 
-            if (values >= 3 && mode == 0x41) {
+            if (values >= 3 && mode == 0x41) 
+            {
                 int data_count = values - 2; // 减去mode和pid
                 ESP_LOGI(TAG, "PID 0x%02X with %d data bytes", pid, data_count);
                 switch (pid) {
@@ -394,14 +430,22 @@ static void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_
             }
         }
         // 3. 处理其他响应（如"NO DATA"）
-        else {
+        else 
+        {
             // 检查是否是"NO DATA"等文本响应
             char response[64] = {0};
             memcpy(response, v, n < 63 ? n : 63);
-            if (strstr(response, "NO DATA") != NULL) {
+            if (strstr(response, "NO DATA") != NULL) 
+            {
                 ESP_LOGW(TAG, "OBD responded: NO DATA");
-            } else if (strstr(response, "SEARCHING") != NULL) {
+            } 
+            else if (strstr(response, "SEARCHING") != NULL) 
+            {
                 ESP_LOGI(TAG, "OBD is searching for protocol...");
+            }
+            else 
+            {   
+                ESP_LOGI(TAG," Other OBD responded: %s",response);
             }
         }
         break;
