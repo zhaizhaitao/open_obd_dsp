@@ -31,7 +31,6 @@ extern lv_obj_t * ui_SpinnerMainPage;
 extern lv_obj_t * ui_ArcGeningRpm;
 extern lv_obj_t * ui_ArcCarSpeed;
 extern lv_obj_t * ui_ArcGearNumBack;
-extern lv_obj_t * ui_ArcGearNumMask;
 extern lv_obj_t * ui_LabelGearNumText;
 extern lv_obj_t * ui_LabelGeningRpmText;
 extern lv_obj_t * ui_LabelGeningRpmUnitText;
@@ -64,7 +63,8 @@ LV_FONT_DECLARE(ui_font_FontBabySize200);
 LV_FONT_DECLARE(ui_font_FontBabySize56);
 LV_FONT_DECLARE(ui_font_FontTaikongSize32);
 LV_FONT_DECLARE(ui_font_FontTaikongSize40);
-
+LV_FONT_DECLARE(ui_font_FontTaikongSize48);
+LV_FONT_DECLARE(ui_font_FontTaikongSize56);
 // UI INIT
 void ui_init(void);
 void ui_event_logo_background(lv_event_t * e);

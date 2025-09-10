@@ -18,27 +18,27 @@ void ui_ScreenPageGear_screen_init(void)
     lv_obj_set_height(ui_SpinnerMainPage1, 466);
     lv_obj_set_align(ui_SpinnerMainPage1, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_SpinnerMainPage1, LV_OBJ_FLAG_CLICKABLE);      /// Flags
-    lv_obj_set_style_arc_color(ui_SpinnerMainPage1, lv_color_hex(0x767A76), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_SpinnerMainPage1, lv_color_hex(0xCC03C8), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_SpinnerMainPage1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_SpinnerMainPage1, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_arc_color(ui_SpinnerMainPage1, lv_color_hex(0x00FF08), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_opa(ui_SpinnerMainPage1, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_SpinnerMainPage1, lv_color_hex(0xCC03C8), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_opa(ui_SpinnerMainPage1, 0, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_SpinnerMainPage1, 10, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
     ui_ArcGearNumBack1 = lv_arc_create(ui_ScreenPageGear);
     lv_obj_set_width(ui_ArcGearNumBack1, 440);
     lv_obj_set_height(ui_ArcGearNumBack1, 440);
     lv_obj_set_align(ui_ArcGearNumBack1, LV_ALIGN_CENTER);
-    lv_arc_set_value(ui_ArcGearNumBack1, 100);
+    lv_arc_set_value(ui_ArcGearNumBack1, 50);
     lv_arc_set_bg_angles(ui_ArcGearNumBack1, 0, 360);
     lv_arc_set_mode(ui_ArcGearNumBack1, LV_ARC_MODE_REVERSE);
-    lv_obj_set_style_arc_color(ui_ArcGearNumBack1, lv_color_hex(0x292C52), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_ArcGearNumBack1, lv_color_hex(0x4F1903), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_ArcGearNumBack1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_ArcGearNumBack1, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_rounded(ui_ArcGearNumBack1, false, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_arc_color(ui_ArcGearNumBack1, lv_color_hex(0x4B4B61), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_ArcGearNumBack1, lv_color_hex(0xCC03C8), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_ArcGearNumBack1, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_ArcGearNumBack1, 20, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_rounded(ui_ArcGearNumBack1, false, LV_PART_INDICATOR | LV_STATE_DEFAULT);
@@ -52,8 +52,8 @@ void ui_ScreenPageGear_screen_init(void)
     lv_obj_set_x(ui_LabelGearNumText1, 5);
     lv_obj_set_y(ui_LabelGearNumText1, -4);
     lv_obj_set_align(ui_LabelGearNumText1, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_LabelGearNumText1, "N");
-    lv_obj_set_style_text_color(ui_LabelGearNumText1, lv_color_hex(0x808080), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_label_set_text(ui_LabelGearNumText1, "1");
+    lv_obj_set_style_text_color(ui_LabelGearNumText1, lv_color_hex(0xCC03C8), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelGearNumText1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LabelGearNumText1, &ui_font_FontBabySize180, LV_PART_MAIN | LV_STATE_DEFAULT);
 

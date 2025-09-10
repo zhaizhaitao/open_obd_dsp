@@ -23,7 +23,6 @@ lv_obj_t * ui_SpinnerMainPage;
 lv_obj_t * ui_ArcGeningRpm;
 lv_obj_t * ui_ArcCarSpeed;
 lv_obj_t * ui_ArcGearNumBack;
-lv_obj_t * ui_ArcGearNumMask;
 lv_obj_t * ui_LabelGearNumText;
 lv_obj_t * ui_LabelGeningRpmText;
 lv_obj_t * ui_LabelGeningRpmUnitText;
