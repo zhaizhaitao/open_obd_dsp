@@ -48,14 +48,16 @@ static void default_on_parsed_fuel_level(uint32_t fuel_level) { ESP_LOGI(TAG, "F
 static void default_on_parsed_throttle_position(uint32_t throttle_position) { ESP_LOGI(TAG, "THROTTLE POSITION: %u %", throttle_position); }
  
 static void obd_poll_task(void *arg) {
-    for(;;){
+    for(;;)
+    {
         if(s_connected)
         {
+            vTaskDelay(pdMS_TO_TICKS(2000));
             break;
         }
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
-    vTaskDelay(pdMS_TO_TICKS(1000)); // 等待连接建立
+
     uint8_t buf[16];
     uint32_t tick_count = 0;
     // 初始化阶段：发送 ELM327 AT 指令
@@ -84,62 +86,50 @@ static void obd_poll_task(void *arg) {
     ESP_LOGI(TAG, " CMD 01 00 send \n");
     vTaskDelay(pdMS_TO_TICKS(100));
 
-    while (1) {
+    while (1) 
+    {
+        switch(tick_count)
+        {
+            case 0://发动机转速
+            {
+                size_t n = elm327_ble_ascii_cmd_to_bytes("01 0C\r", buf, sizeof(buf));
+                elm327_ble_send_command(buf, n);
+                ESP_LOGI(TAG, "Send 01 0C\r");
+                break;
+            }
+            case 1://车速
+            {
+                size_t n = elm327_ble_ascii_cmd_to_bytes("01 0D\r", buf, sizeof(buf));
+                elm327_ble_send_command(buf, n);
+                ESP_LOGI(TAG, "Send 01 0D\r");
+                break;
+            }
+            case 2:
+            {
+
+                break;
+            }
+            case 3:
+            {
+
+                break;
+            }
+            case 4:
+            {
+
+                break;
+            }
+            default:
+                break;
+        }
+ 
         tick_count++;
-        
-        // 转速/车速 - 1000ms 查询一次
-         if (tick_count % (400 / 200) == 0)/*1s*/
-         { // 每200ms执行
-            size_t n = elm327_ble_ascii_cmd_to_bytes("01 0C\r", buf, sizeof(buf));
-            if (n) { elm327_ble_send_command(buf, n); }
-            ESP_LOGI(TAG, "send 01 0C\r");
-            vTaskDelay(pdMS_TO_TICKS(100));
-             n = elm327_ble_ascii_cmd_to_bytes("01 0D\r", buf, sizeof(buf));
-             if (n) { elm327_ble_send_command(buf, n); }
-             ESP_LOGI(TAG, "send 01 0D\r");
-    
+        if(tick_count > 1)
+        {
+            tick_count = 0;
         }
 
-        if (tick_count % (1400 / 200) == 0)/*5s*/
-         { // 每200ms执行
-            vTaskDelay(pdMS_TO_TICKS(100));
-            size_t n = elm327_ble_ascii_cmd_to_bytes("3E 00\r", buf, sizeof(buf));
-            if (n) { elm327_ble_send_command(buf, n); }
-            ESP_LOGI(TAG, "send 3E 00\r");
-         }
-
-
-    #if 0    
-        // 绝对压力和节气门位置 - 1s 查询一次
-        if (tick_count % 5 == 0) { // 每1s执行
-            size_t n = elm327_ble_ascii_cmd_to_bytes("01 10\r", buf, sizeof(buf));
-            if (n) { elm327_ble_send_command(buf, n); }
-            vTaskDelay(pdMS_TO_TICKS(50));
-            n = elm327_ble_ascii_cmd_to_bytes("01 11\r", buf, sizeof(buf));
-            if (n) { elm327_ble_send_command(buf, n); }
-            vTaskDelay(pdMS_TO_TICKS(50));
-        }
-        
-        // 冷却液温度/进气温度/控制模块电压 - 5s 查询一次
-        if (tick_count % 25 == 0) { // 每5s执行
-            size_t n = elm327_ble_ascii_cmd_to_bytes("01 05\r", buf, sizeof(buf));
-            if (n) { elm327_ble_send_command(buf, n); }
-            vTaskDelay(pdMS_TO_TICKS(50));
-            n = elm327_ble_ascii_cmd_to_bytes("01 0F\r", buf, sizeof(buf));
-            if (n) { elm327_ble_send_command(buf, n); }
-            vTaskDelay(pdMS_TO_TICKS(50));
-            n = elm327_ble_ascii_cmd_to_bytes("01 42\r", buf, sizeof(buf));
-            if (n) { elm327_ble_send_command(buf, n); }
-            vTaskDelay(pdMS_TO_TICKS(50));
-        }  
-        // 燃油液位 - 10s 查询一次
-        if (tick_count % 50 == 0) { // 每10s执行
-            size_t n = elm327_ble_ascii_cmd_to_bytes("01 2F\r", buf, sizeof(buf));
-            if (n) { elm327_ble_send_command(buf, n); }
-            vTaskDelay(pdMS_TO_TICKS(50));
-        }
-    #endif
-        vTaskDelay(pdMS_TO_TICKS(200)); // 基础周期200ms
+        vTaskDelay(pdMS_TO_TICKS(400)); // 基础周期400ms
     }
 }
 
