@@ -2,7 +2,7 @@
 // SquareLine Studio version: SquareLine Studio 1.5.0
 // LVGL version: 8.3.11
 // Project name: OBD_PRJ
-
+// UI主题命名为 PINK_CAT(粉色猫咪)，主色调为粉色，副色调为紫色
 #include "ui.h"
 #include "ui_helpers.h"
 #include <driver/gpio.h>
