@@ -34,16 +34,36 @@ lv_obj_t * ui_LabelCarSpeedUnitText;
 // SCREEN: ui_ScreenPageGear
 void ui_ScreenPageGear_screen_init(void);
 lv_obj_t * ui_ScreenPageGear;
-lv_obj_t * ui_SpinnerMainPage1;
-lv_obj_t * ui_ArcGearNumBack1;
-lv_obj_t * ui_LabelGearNumText1;
+lv_obj_t * ui_SpinnerGearPage;
+lv_obj_t * ui_GearPageArcGearNumBack;
+lv_obj_t * ui_GearPageArcLabelGearNumText;
+// CUSTOM VARIABLES
+
+
+// SCREEN: ui_ScreenPageRpm
+void ui_ScreenPageRpm_screen_init(void);
+lv_obj_t * ui_ScreenPageRpm;
+lv_obj_t * ui_SpinnerRpmPage;
+lv_obj_t * ui_RpmPageArcRpmBack;
+lv_obj_t * ui_RpmPageArcLabelRpmText;
+lv_obj_t * ui_RpmPageArcLabelRpmUnit;
+// CUSTOM VARIABLES
+
+
+// SCREEN: ui_ScreenPageSpeed
+void ui_ScreenPageSpeed_screen_init(void);
+lv_obj_t * ui_ScreenPageSpeed;
+lv_obj_t * ui_SpinnerSpeedPage;
+lv_obj_t * ui_SpeedPageArcSpeedBack;
+lv_obj_t * ui_SpeedPageArcLabelSpeedText;
+lv_obj_t * ui_SpeedPageArcLabelSpeedUnit;
 // CUSTOM VARIABLES
 
 // EVENTS
 lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
-const lv_img_dsc_t * ui_imgset_pngmainback[2] = {&ui_img_pngmainback2_png, &ui_img_pngmainback3_png};
+ 
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #define RPM_MAX 5000
@@ -59,16 +79,24 @@ void my_timerMain(lv_timer_t * timer)
     usRpm   = obd_data_get_rpm();
     ucSpeed = obd_data_get_speed();
     eGear = calculate_gear(usRpm, ucSpeed);
+    /*主页面*/
     lv_label_set_text_fmt(ui_LabelGeningRpmText, "%d", usRpm);
     lv_label_set_text_fmt(ui_LabelCarSpeedText, "%d", ucSpeed);
     lv_label_set_text_fmt (ui_LabelGearNumText, pGearNum[eGear]);
-    lv_label_set_text_fmt(ui_LabelGearNumText1, pGearNum[eGear]);
     lv_arc_set_value(ui_ArcGeningRpm, (uint32_t)usRpm*100/RPM_MAX);
     lv_arc_set_value(ui_ArcCarSpeed, (uint16_t)ucSpeed*100/SPEED_MAX);
     lv_arc_set_value(ui_ArcGearNumBack, (uint16_t)eGear*100/5);
 
-
-
+/*档位页面*/
+    lv_label_set_text_fmt(ui_GearPageArcLabelGearNumText, pGearNum[eGear]);
+    lv_arc_set_value(ui_GearPageArcGearNumBack, (uint16_t)eGear*100/5);
+ /*转速页面*/
+    lv_label_set_text_fmt(ui_RpmPageArcLabelRpmText, "%d", usRpm);
+    lv_arc_set_value(ui_RpmPageArcRpmBack, (uint32_t)usRpm*100/RPM_MAX);
+ /*速度页面*/
+    lv_label_set_text_fmt(ui_SpeedPageArcLabelSpeedText, "%d", ucSpeed);
+    lv_arc_set_value(ui_SpeedPageArcSpeedBack, (uint16_t)ucSpeed*100/SPEED_MAX);
+ 
 #if EXAMPLE_PIN_NUM_BK_LIGHT >= 0
         //等待500ms后开背光，避免没有初始化完成就开背光，只执行一次
         if(ucOnlyOnce == 0)
@@ -111,11 +139,43 @@ void ui_event_main_background(lv_event_t * e)
         lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&ui_ScreenPageGear, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageGear_screen_init);  
     }
+    else if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_ScreenPageSpeed, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageSpeed_screen_init);  
+    }
 }
 void ui_event_gear_background(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_ScreenPageMain, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageMain_screen_init);  
+    }
+    else if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_ScreenPageRpm, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageRpm_screen_init);  
+    }
+}
+void ui_event_rpm_background(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_ScreenPageGear, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageGear_screen_init);  
+    }
+    else if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_ScreenPageSpeed, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageSpeed_screen_init);  
+    }
+}
+void ui_event_speed_background(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_ScreenPageRpm, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageRpm_screen_init); 
+    }
+    else if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
         lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&ui_ScreenPageMain, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageMain_screen_init);  
     }
@@ -131,6 +191,8 @@ void ui_init(void)
     ui_ScreenPageLogo_screen_init();
     ui_ScreenPageMain_screen_init();
     ui_ScreenPageGear_screen_init();
+    ui_ScreenPageRpm_screen_init();
+    ui_ScreenPageSpeed_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_ScreenPageLogo);
 

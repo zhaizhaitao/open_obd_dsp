@@ -14,7 +14,7 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_style_bg_opa(ui_ScreenPageMain, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ImageMainPageback = lv_img_create(ui_ScreenPageMain);
-    lv_img_set_src(ui_ImageMainPageback, &ui_img_pngmainback3_png);
+    lv_img_set_src(ui_ImageMainPageback, &ui_img_pngmainback_png);
     lv_obj_set_width(ui_ImageMainPageback, LV_SIZE_CONTENT);   /// 400
     lv_obj_set_height(ui_ImageMainPageback, LV_SIZE_CONTENT);    /// 400
     lv_obj_set_align(ui_ImageMainPageback, LV_ALIGN_CENTER);
@@ -26,11 +26,11 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_height(ui_SpinnerMainPage, 466);
     lv_obj_set_align(ui_SpinnerMainPage, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_SpinnerMainPage, LV_OBJ_FLAG_CLICKABLE);      /// Flags
-    lv_obj_set_style_arc_color(ui_SpinnerMainPage, lv_color_hex(0x410641), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_SpinnerMainPage, lv_color_hex( COLOR_SECONDARY_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_SpinnerMainPage, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_SpinnerMainPage, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_arc_color(ui_SpinnerMainPage, lv_color_hex(0xCC03C8), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_SpinnerMainPage, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_SpinnerMainPage, 0, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_SpinnerMainPage, 10, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
@@ -38,14 +38,15 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_width(ui_ArcGeningRpm, 440);
     lv_obj_set_height(ui_ArcGeningRpm, 440);
     lv_obj_set_align(ui_ArcGeningRpm, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_ArcGeningRpm, LV_OBJ_FLAG_CLICKABLE);      /// Flags
     lv_arc_set_value(ui_ArcGeningRpm, 50);
     lv_arc_set_bg_angles(ui_ArcGeningRpm, 155, 265);
-    lv_obj_set_style_arc_color(ui_ArcGeningRpm, lv_color_hex(0x410641), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_ArcGeningRpm, lv_color_hex( COLOR_SECONDARY_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_ArcGeningRpm, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_ArcGeningRpm, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_rounded(ui_ArcGeningRpm, false, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_arc_color(ui_ArcGeningRpm, lv_color_hex(0xCF08EC), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_ArcGeningRpm, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_ArcGeningRpm, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_ArcGeningRpm, 20, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_rounded(ui_ArcGeningRpm, false, LV_PART_INDICATOR | LV_STATE_DEFAULT);
@@ -57,15 +58,16 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_width(ui_ArcCarSpeed, 440);
     lv_obj_set_height(ui_ArcCarSpeed, 440);
     lv_obj_set_align(ui_ArcCarSpeed, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_ArcCarSpeed, LV_OBJ_FLAG_CLICKABLE);      /// Flags
     lv_arc_set_value(ui_ArcCarSpeed, 50);
     lv_arc_set_bg_angles(ui_ArcCarSpeed, 275, 25);
     lv_arc_set_mode(ui_ArcCarSpeed, LV_ARC_MODE_REVERSE);
-    lv_obj_set_style_arc_color(ui_ArcCarSpeed, lv_color_hex(0x410641), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_ArcCarSpeed, lv_color_hex( COLOR_SECONDARY_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_ArcCarSpeed, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_ArcCarSpeed, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_rounded(ui_ArcCarSpeed, false, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_arc_color(ui_ArcCarSpeed, lv_color_hex(0xCF08EC), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_ArcCarSpeed, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_ArcCarSpeed, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_ArcCarSpeed, 20, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_rounded(ui_ArcCarSpeed, false, LV_PART_INDICATOR | LV_STATE_DEFAULT);
@@ -77,15 +79,16 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_width(ui_ArcGearNumBack, 440);
     lv_obj_set_height(ui_ArcGearNumBack, 440);
     lv_obj_set_align(ui_ArcGearNumBack, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_ArcGearNumBack, LV_OBJ_FLAG_CLICKABLE);      /// Flags
     lv_arc_set_value(ui_ArcGearNumBack, 60);
     lv_arc_set_bg_angles(ui_ArcGearNumBack, 35, 145);
     lv_arc_set_mode(ui_ArcGearNumBack, LV_ARC_MODE_REVERSE);
-    lv_obj_set_style_arc_color(ui_ArcGearNumBack, lv_color_hex(0x410641), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_ArcGearNumBack, lv_color_hex( COLOR_SECONDARY_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_ArcGearNumBack, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_ArcGearNumBack, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_rounded(ui_ArcGearNumBack, false, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_arc_color(ui_ArcGearNumBack, lv_color_hex(0xCF08EC), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_ArcGearNumBack, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_ArcGearNumBack, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_ArcGearNumBack, 20, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_rounded(ui_ArcGearNumBack, false, LV_PART_INDICATOR | LV_STATE_DEFAULT);
@@ -100,53 +103,54 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_y(ui_LabelGearNumText, 115);
     lv_obj_set_align(ui_LabelGearNumText, LV_ALIGN_CENTER);
     lv_label_set_text(ui_LabelGearNumText, "N");
-    lv_obj_set_style_text_color(ui_LabelGearNumText, lv_color_hex(0xCF08EC), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_LabelGearNumText, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelGearNumText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LabelGearNumText, &ui_font_FontBabySize56, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LabelGeningRpmText = lv_label_create(ui_ScreenPageMain);
     lv_obj_set_width(ui_LabelGeningRpmText, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelGeningRpmText, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_LabelGeningRpmText, -99);
-    lv_obj_set_y(ui_LabelGeningRpmText, -49);
+    lv_obj_set_x(ui_LabelGeningRpmText, -90);
+    lv_obj_set_y(ui_LabelGeningRpmText, -55);
     lv_obj_set_align(ui_LabelGeningRpmText, LV_ALIGN_CENTER);
     lv_label_set_text(ui_LabelGeningRpmText, "2000");
-    lv_obj_set_style_text_color(ui_LabelGeningRpmText, lv_color_hex(0xCF08EC), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_LabelGeningRpmText, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelGeningRpmText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_LabelGeningRpmText, &ui_font_FontTaikongSize56, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_LabelGeningRpmText, &ui_font_FontTaikongSize64, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LabelGeningRpmUnitText = lv_label_create(ui_ScreenPageMain);
     lv_obj_set_width(ui_LabelGeningRpmUnitText, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelGeningRpmUnitText, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_LabelGeningRpmUnitText, -100);
-    lv_obj_set_y(ui_LabelGeningRpmUnitText, -6);
+    lv_obj_set_y(ui_LabelGeningRpmUnitText, 0);
     lv_obj_set_align(ui_LabelGeningRpmUnitText, LV_ALIGN_CENTER);
     lv_label_set_text(ui_LabelGeningRpmUnitText, "rpm");
-    lv_obj_set_style_text_color(ui_LabelGeningRpmUnitText, lv_color_hex(0xCF08EC), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_LabelGeningRpmUnitText, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelGeningRpmUnitText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_LabelGeningRpmUnitText, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_LabelGeningRpmUnitText, &ui_font_FontTaikongSize32, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LabelCarSpeedText = lv_label_create(ui_ScreenPageMain);
     lv_obj_set_width(ui_LabelCarSpeedText, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelCarSpeedText, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_LabelCarSpeedText, 96);
-    lv_obj_set_y(ui_LabelCarSpeedText, -46);
+    lv_obj_set_x(ui_LabelCarSpeedText, 90);
+    lv_obj_set_y(ui_LabelCarSpeedText, -55);
     lv_obj_set_align(ui_LabelCarSpeedText, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_LabelCarSpeedText, "99");
-    lv_obj_set_style_text_color(ui_LabelCarSpeedText, lv_color_hex(0xCF08EC), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_label_set_text(ui_LabelCarSpeedText, "45");
+    lv_obj_set_style_text_color(ui_LabelCarSpeedText, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelCarSpeedText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_LabelCarSpeedText, &ui_font_FontTaikongSize56, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_LabelCarSpeedText, &ui_font_FontTaikongSize64, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LabelCarSpeedUnitText = lv_label_create(ui_ScreenPageMain);
     lv_obj_set_width(ui_LabelCarSpeedUnitText, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelCarSpeedUnitText, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_LabelCarSpeedUnitText, 102);
-    lv_obj_set_y(ui_LabelCarSpeedUnitText, -4);
+    lv_obj_set_x(ui_LabelCarSpeedUnitText, 100);
+    lv_obj_set_y(ui_LabelCarSpeedUnitText, 0);
     lv_obj_set_align(ui_LabelCarSpeedUnitText, LV_ALIGN_CENTER);
     lv_label_set_text(ui_LabelCarSpeedUnitText, "km/h");
-    lv_obj_set_style_text_color(ui_LabelCarSpeedUnitText, lv_color_hex(0xCF08EC), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_LabelCarSpeedUnitText, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelCarSpeedUnitText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_LabelCarSpeedUnitText, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_LabelCarSpeedUnitText, &ui_font_FontTaikongSize32, LV_PART_MAIN | LV_STATE_DEFAULT);
+
 
     lv_obj_add_event_cb(ui_ArcGearNumBack, ui_event_main_background, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_ScreenPageMain, ui_event_main_background, LV_EVENT_GESTURE, NULL);
