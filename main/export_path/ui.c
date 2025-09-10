@@ -48,6 +48,7 @@ const lv_img_dsc_t * ui_imgset_pngmainback[2] = {&ui_img_pngmainback2_png, &ui_i
 
 void my_timerMain(lv_timer_t * timer)
 {
+    char *pGearNum[] = {"N","1", "2", "3", "4", "5"};
     static uint16_t usRpm = 0;
     static uint8_t ucSpeed = 0;
     usRpm   = obd_data_get_rpm();
@@ -56,6 +57,7 @@ void my_timerMain(lv_timer_t * timer)
     lv_label_set_text_fmt(ui_LabelCarSpeedText, "%d", ucSpeed);
     lv_arc_set_value(ui_ArcGeningRpm, (uint32_t)usRpm*100/7000);
     lv_arc_set_value(ui_ArcCarSpeed, (uint16_t)ucSpeed*100/200);
+    lv_label_set_text_fmt (ui_LabelGearNumText, pGearNum[calculate_gear(usRpm, ucSpeed)]);
 }
 ///////////////////// ANIMATIONS ////////////////////
 

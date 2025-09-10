@@ -79,7 +79,7 @@ uint8_t obd_data_get_speed(void)
 Gear calculate_gear(float rpm, float speed) {
     // 1. 检查输入数据有效性
     if (rpm <= 0 || speed <= 0) {
-        return GEAR_INVALID;
+        return GEAR_NEUTRAL;
     }
     
     // 2. 计算总传动比
@@ -97,7 +97,7 @@ Gear calculate_gear(float rpm, float speed) {
     }
     
     // 4. 如果在所有范围外，检查是否可能为空档（转速高车速为零）
-    if (rpm > 800 && speed < 5) { // 怠速以上且几乎静止
+    if (rpm > 700 && speed < 5) { // 怠速以上且几乎静止
         return GEAR_NEUTRAL;
     }
     
