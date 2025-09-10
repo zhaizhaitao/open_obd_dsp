@@ -50,9 +50,9 @@ void obd_data_set_speed(uint8_t kmh)
     portEXIT_CRITICAL(&s_mux);
 }
 
-#define RPM_SMOOTH_TIME_MS   3000  // 转速缓升缓降时间常数 (ms)
-#define SPEED_SMOOTH_TIME_MS 3000  // 速度缓升缓降时间常数 (ms)
-#define FALL_TO_ZERO_MS      1000  // 归零缓降时间常数 (ms)
+#define RPM_SMOOTH_TIME_MS   1000  // 转速缓升缓降时间常数 (ms)
+#define SPEED_SMOOTH_TIME_MS 1000  // 速度缓升缓降时间常数 (ms)
+#define FALL_TO_ZERO_MS      500  // 归零缓降时间常数 (ms)
 
 // 实时转速（缓升缓降）获取
 uint16_t obd_data_get_rpm(void)
@@ -117,8 +117,10 @@ uint8_t obd_data_get_speed(void)
  * @return 计算出的档位
  */
 Gear calculate_gear(float rpm, float speed) {
+    static Gear s_last_gear = GEAR_NEUTRAL;
     // 1. 检查输入数据有效性
     if (rpm <= 0 || speed <= 0) {
+        s_last_gear = GEAR_NEUTRAL;
         return GEAR_NEUTRAL;
     }
     
@@ -132,17 +134,19 @@ Gear calculate_gear(float rpm, float speed) {
     for (int i = 0; i < GEAR_RANGE_COUNT; i++) {
         if (total_ratio >= gear_ranges[i].min_ratio && 
             total_ratio <= gear_ranges[i].max_ratio) {
+            s_last_gear = gear_ranges[i].gear;//记录当前档位
             return gear_ranges[i].gear;
         }
     }
     
     // 4. 如果在所有范围外，检查是否可能为空档（转速高车速为零）
-    if (rpm > 700 && speed < 5) { // 怠速以上且几乎静止
+    if (rpm > 800 && speed < 5) { // 怠速以上且几乎静止
+        s_last_gear = GEAR_NEUTRAL;
         return GEAR_NEUTRAL;
     }
     
-    // 5. 无法识别的传动比
-    return GEAR_NEUTRAL;
+    // 5. 无法识别的传动比 返回上一次档位
+    return s_last_gear;
 }
 
   
