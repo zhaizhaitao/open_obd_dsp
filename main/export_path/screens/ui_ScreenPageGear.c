@@ -52,10 +52,11 @@ void ui_ScreenPageGear_screen_init(void)
     lv_obj_set_x(ui_LabelGearNumText1, 5);
     lv_obj_set_y(ui_LabelGearNumText1, -4);
     lv_obj_set_align(ui_LabelGearNumText1, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_LabelGearNumText1, "1");
+    lv_label_set_text(ui_LabelGearNumText1, "N");
     lv_obj_set_style_text_color(ui_LabelGearNumText1, lv_color_hex(0x808080), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelGearNumText1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LabelGearNumText1, &ui_font_FontBabySize180, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-
+    lv_obj_add_event_cb(ui_ArcGearNumBack1, ui_event_gear_background, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_ScreenPageGear, ui_event_gear_background, LV_EVENT_GESTURE, NULL);
 }

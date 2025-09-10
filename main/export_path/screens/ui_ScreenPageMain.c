@@ -13,13 +13,13 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_style_bg_color(ui_ScreenPageMain, lv_color_hex(0x1C2053), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_ScreenPageMain, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Image1 = lv_img_create(ui_ScreenPageMain);
-    lv_img_set_src(ui_Image1, &ui_img_pngmainback3_png);
-    lv_obj_set_width(ui_Image1, LV_SIZE_CONTENT);   /// 400
-    lv_obj_set_height(ui_Image1, LV_SIZE_CONTENT);    /// 400
-    lv_obj_set_align(ui_Image1, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Image1, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
-    lv_obj_clear_flag(ui_Image1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_ImageMainPageback = lv_img_create(ui_ScreenPageMain);
+    lv_img_set_src(ui_ImageMainPageback, &ui_img_pngmainback3_png);
+    lv_obj_set_width(ui_ImageMainPageback, LV_SIZE_CONTENT);   /// 400
+    lv_obj_set_height(ui_ImageMainPageback, LV_SIZE_CONTENT);    /// 400
+    lv_obj_set_align(ui_ImageMainPageback, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_ImageMainPageback, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_ImageMainPageback, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_SpinnerMainPage = lv_spinner_create(ui_ScreenPageMain, 1000, 90);
     lv_obj_set_width(ui_SpinnerMainPage, 466);
@@ -119,7 +119,7 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_x(ui_LabelGearNumText, 0);
     lv_obj_set_y(ui_LabelGearNumText, 115);
     lv_obj_set_align(ui_LabelGearNumText, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_LabelGearNumText, "n");
+    lv_label_set_text(ui_LabelGearNumText, "N");
     lv_obj_set_style_text_color(ui_LabelGearNumText, lv_color_hex(0x808080), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelGearNumText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LabelGearNumText, &ui_font_FontBabySize56, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -168,5 +168,6 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_style_text_opa(ui_LabelCarSpeedUnitText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LabelCarSpeedUnitText, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-
+    lv_obj_add_event_cb(ui_ArcGearNumMask, ui_event_main_background, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_ScreenPageMain, ui_event_main_background, LV_EVENT_GESTURE, NULL);
 }

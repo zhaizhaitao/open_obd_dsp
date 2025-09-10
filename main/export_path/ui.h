@@ -26,7 +26,7 @@ extern lv_obj_t * gif_logo;
 // SCREEN: ui_ScreenPageMain
 void ui_ScreenPageMain_screen_init(void);
 extern lv_obj_t * ui_ScreenPageMain;
-extern lv_obj_t * ui_Image1;
+extern lv_obj_t * ui_ImageMainPageback;
 extern lv_obj_t * ui_SpinnerMainPage;
 extern lv_obj_t * ui_ArcGeningRpm;
 extern lv_obj_t * ui_ArcCarSpeed;
@@ -68,6 +68,8 @@ LV_FONT_DECLARE(ui_font_FontTaikongSize40);
 // UI INIT
 void ui_init(void);
 void ui_event_logo_background(lv_event_t * e);
+void ui_event_main_background(lv_event_t * e);
+void ui_event_gear_background(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

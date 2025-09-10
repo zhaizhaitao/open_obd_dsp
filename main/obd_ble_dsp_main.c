@@ -358,10 +358,6 @@ void app_main(void)
         };
         ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
     }
-#if EXAMPLE_PIN_NUM_BK_LIGHT >= 0
-    ESP_LOGI(TAG, "Turn on LCD backlight");
-    gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
-#endif
 
     ESP_LOGI(TAG, "Initialize SPI bus");
     const spi_bus_config_t buscfg =
@@ -499,7 +495,6 @@ void app_main(void)
     xTaskCreate(example_lvgl_port_task, "LVGL", EXAMPLE_LVGL_TASK_STACK_SIZE, NULL, EXAMPLE_LVGL_TASK_PRIORITY, NULL);
    
     ESP_LOGI(TAG, "Display LVGL demos");
-    //gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL);//暂时关灯
     // Lock the mutex due to the LVGL APIs are not thread-safe
     if (example_lvgl_lock(-1)) {
         ui_init();

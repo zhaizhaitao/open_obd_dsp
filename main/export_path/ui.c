@@ -18,7 +18,7 @@ lv_obj_t * gif_logo;
 // SCREEN: ui_ScreenPageMain
 void ui_ScreenPageMain_screen_init(void);
 lv_obj_t * ui_ScreenPageMain;
-lv_obj_t * ui_Image1;
+lv_obj_t * ui_ImageMainPageback;
 lv_obj_t * ui_SpinnerMainPage;
 lv_obj_t * ui_ArcGeningRpm;
 lv_obj_t * ui_ArcCarSpeed;
@@ -47,7 +47,8 @@ lv_obj_t * ui____initial_actions0;
 const lv_img_dsc_t * ui_imgset_pngmainback[2] = {&ui_img_pngmainback2_png, &ui_img_pngmainback3_png};
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
-
+#define RPM_MAX 5000
+#define SPEED_MAX 160
 void my_timerMain(lv_timer_t * timer)
 {
     char *pGearNum[] = {"N","1", "2", "3", "4", "5"};
@@ -59,23 +60,26 @@ void my_timerMain(lv_timer_t * timer)
     ucSpeed = obd_data_get_speed();
     lv_label_set_text_fmt(ui_LabelGeningRpmText, "%d", usRpm);
     lv_label_set_text_fmt(ui_LabelCarSpeedText, "%d", ucSpeed);
-    lv_arc_set_value(ui_ArcGeningRpm, (uint32_t)usRpm*100/7000);
-    lv_arc_set_value(ui_ArcCarSpeed, (uint16_t)ucSpeed*100/200);
+    lv_arc_set_value(ui_ArcGeningRpm, (uint32_t)usRpm*100/RPM_MAX);
+    lv_arc_set_value(ui_ArcCarSpeed, (uint16_t)ucSpeed*100/SPEED_MAX);
     lv_label_set_text_fmt (ui_LabelGearNumText, pGearNum[calculate_gear(usRpm, ucSpeed)]);
+    lv_label_set_text_fmt(ui_LabelGearNumText1, pGearNum[calculate_gear(usRpm, ucSpeed)]);
 
-// #if EXAMPLE_PIN_NUM_BK_LIGHT >= 0
-//         //等待500ms后开背光，避免没有初始化完成就开背光，只执行一次
-//         if(ucOnlyOnce == 0)
-//         {
-//             if(ulOpenLightTimeCnt > 400 / 200)
-//             {
-//                 gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
-//                 ESP_LOGI(TAG, "Turn on LCD backlight");
-//                 ulOpenLightTimeCnt = 0;
-//                 ucOnlyOnce = 1;//只执行一次
-//             }
-//         }
-// #endif
+
+#if EXAMPLE_PIN_NUM_BK_LIGHT >= 0
+        //等待500ms后开背光，避免没有初始化完成就开背光，只执行一次
+        if(ucOnlyOnce == 0)
+        {
+            ulOpenLightTimeCnt++;
+            if(ulOpenLightTimeCnt > 400 / 200)
+            {
+                gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
+                ESP_LOGI(TAG, "Turn on LCD backlight");
+                ulOpenLightTimeCnt = 0;
+                ucOnlyOnce = 1;//只执行一次
+            }
+        }
+#endif
 }
 ///////////////////// ANIMATIONS ////////////////////
 
@@ -95,7 +99,22 @@ void ui_event_logo_background(lv_event_t * e)
     }   
 }
 
-
+void ui_event_main_background(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) { 
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_ScreenPageGear, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageGear_screen_init);  
+    }
+}
+void ui_event_gear_background(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_ScreenPageMain, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageMain_screen_init);  
+    }
+}
 ///////////////////// SCREENS ////////////////////
 
 void ui_init(void)
@@ -106,6 +125,7 @@ void ui_init(void)
     lv_disp_set_theme(dispp, theme);
     ui_ScreenPageLogo_screen_init();
     ui_ScreenPageMain_screen_init();
+    ui_ScreenPageGear_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_ScreenPageLogo);
 
