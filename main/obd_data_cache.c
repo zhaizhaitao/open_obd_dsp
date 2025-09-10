@@ -1,6 +1,7 @@
 #include "obd_data_cache.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/portmacro.h"
+#include "freertos/task.h"
 #include <math.h>
 
 // 车辆常量定义 (根据您的东南菱悦V3 11款手动挡 195/55R15轮胎)
@@ -8,6 +9,7 @@
 #define TIRE_ROLLING_RADIUS_M  0.298f
 #define CONSTANT_C             0.377f
 #define CALCULATION_CONSTANT   5.128f // 1 / (FINAL_DRIVE_RATIO * CONSTANT_C * TIRE_ROLLING_RADIUS_M)
+
  
 // 档位传动比范围结构体
 typedef struct {
@@ -48,26 +50,64 @@ void obd_data_set_speed(uint8_t kmh)
     portEXIT_CRITICAL(&s_mux);
 }
 
+#define RPM_SMOOTH_TIME_MS   3000  // 转速缓升缓降时间常数 (ms)
+#define SPEED_SMOOTH_TIME_MS 3000  // 速度缓升缓降时间常数 (ms)
+#define FALL_TO_ZERO_MS      1000  // 归零缓降时间常数 (ms)
+
+// 实时转速（缓升缓降）获取
 uint16_t obd_data_get_rpm(void)
 {
-    uint16_t v;
+    static TickType_t last_tick = 0;
+    static float smooth = 0.f;
+
+    uint16_t raw;
     portENTER_CRITICAL(&s_mux);
-    v = s_rpm;
+    raw = s_rpm;
     portEXIT_CRITICAL(&s_mux);
-    return v;
+
+    TickType_t now_tick = xTaskGetTickCount();
+    uint32_t dt_ms = (now_tick - last_tick) * portTICK_PERIOD_MS;
+    if (dt_ms > 1000) dt_ms = 1000;
+
+    uint32_t tc = (raw == 0) ? FALL_TO_ZERO_MS : RPM_SMOOTH_TIME_MS;
+    float alpha = (float)dt_ms / (float)tc;
+    if (alpha > 1.0f) alpha = 1.0f;
+
+    smooth += alpha * ((float)raw - smooth);
+    last_tick = now_tick;
+
+    return (uint16_t)(smooth + 0.5f);
 }
 
+
+// 实时速度（缓升缓降）获取
 uint8_t obd_data_get_speed(void)
 {
-    uint8_t v;
+    static TickType_t last_tick = 0;
+    static float smooth = 0.f; // 保留小数以获得更细腻的过渡
+
+    // 1. 取原始速度
+    uint8_t raw;
     portENTER_CRITICAL(&s_mux);
-    v = s_speed;
+    raw = s_speed;
     portEXIT_CRITICAL(&s_mux);
-    return v;
+
+    // 2. 计算距离上次调用的时间，单位 ms
+    TickType_t now_tick = xTaskGetTickCount();
+    uint32_t dt_ms = (now_tick - last_tick) * portTICK_PERIOD_MS;
+    if (dt_ms > 1000) dt_ms = 1000; // 限制单次过大步长，防止休眠后跳变
+
+    // 3. 时间常数的一阶滤波 alpha = dt / SPEED_SMOOTH_TIME_MS
+    uint32_t tc = (raw == 0) ? FALL_TO_ZERO_MS : SPEED_SMOOTH_TIME_MS;
+    float alpha = (float)dt_ms / (float)tc;
+    if (alpha > 1.0f) alpha = 1.0f;
+
+    // 4. 更新平滑值
+    smooth += alpha * ((float)raw - smooth);
+    last_tick = now_tick;
+
+    return (uint8_t)(smooth + 0.5f); // 四舍五入返回
 }
-
-
-
 
 
 /**

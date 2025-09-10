@@ -32,7 +32,7 @@ static char s_target_name[32] = "OBDII";
 
 // 增加全局 ready 标志
 static volatile bool s_elm_ready = true; // 初始允许发送首条 ATZ
-
+bool elm327_ble_send_ascii_blocking(const char *ascii_cmd);
 // 默认回调与轮询任务（可选）
 static void default_on_connected(void) { ESP_LOGI(TAG, "OBD BLE connected"); }
 static void default_on_disconnected(void) { ESP_LOGI(TAG, "OBD BLE disconnected"); }
@@ -65,7 +65,6 @@ static void obd_poll_task(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
-    uint8_t buf[16];
     uint32_t tick_count = 0;
     // 初始化阶段：发送 ELM327 AT 指令
     const char *init_cmds[] = {
@@ -96,7 +95,7 @@ static void obd_poll_task(void *arg) {
             case 0://发动机转速
             {
                 elm327_ble_send_ascii_blocking("01 0C\r");
-                ESP_LOGI(TAG, "Send 01 0C\r");
+                ESP_LOGI(TAG, "Send 01 0C\r");  
                 break;
             }
             case 1://车速
