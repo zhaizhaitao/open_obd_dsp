@@ -12,11 +12,18 @@ void ui_ScreenPageLogo_screen_init(void)
     lv_obj_set_style_radius(ui_ScreenPageLogo, 466, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_ScreenPageLogo, lv_color_hex(0x0000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_ScreenPageLogo, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    gif_logo = lv_gif_create(ui_ScreenPageLogo);
-    lv_gif_set_src(gif_logo, &gifSnake400);
-    lv_obj_align(gif_logo, LV_ALIGN_CENTER, 0, 0);
-
+#if USE_GIF_LOGO == 1
+    imageLogo = lv_gif_create(ui_ScreenPageLogo);
+    lv_gif_set_src(imageLogo, &gifSnake400);
+    lv_obj_align(imageLogo, LV_ALIGN_CENTER, 0, 0);
+#else
+    imageLogo = lv_img_create(ui_ScreenPageLogo);
+    lv_img_set_src(imageLogo, &pngLogoMITSUBISHI);
+    lv_obj_set_width(imageLogo, LV_SIZE_CONTENT);   /// 400
+    lv_obj_set_height(imageLogo, LV_SIZE_CONTENT);    /// 400
+    lv_obj_set_align(imageLogo, LV_ALIGN_CENTER);
+    lv_obj_set_y(imageLogo, -20);
+#endif
     lv_obj_add_event_cb(ui_ScreenPageLogo, ui_event_logo_background, LV_EVENT_ALL, NULL);
 }
 

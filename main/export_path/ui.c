@@ -13,7 +13,7 @@ static const char *TAG = "ui";
 ///////////////////// VARIABLES ////////////////////
 void ui_ScreenPageLogo_screen_init(void);
 lv_obj_t * ui_ScreenPageLogo;
-lv_obj_t * gif_logo;
+lv_obj_t * imageLogo;
 
 // SCREEN: ui_ScreenPageMain
 void ui_ScreenPageMain_screen_init(void);
@@ -53,16 +53,20 @@ void my_timerMain(lv_timer_t * timer)
     char *pGearNum[] = {"N","1", "2", "3", "4", "5"};
     static uint16_t usRpm = 0;
     static uint8_t ucSpeed = 0;
+    static Gear eGear = GEAR_NEUTRAL;
     static uint8_t ucOnlyOnce = 0;
     static uint32_t ulOpenLightTimeCnt = 0;
     usRpm   = obd_data_get_rpm();
     ucSpeed = obd_data_get_speed();
+    eGear = calculate_gear(usRpm, ucSpeed);
     lv_label_set_text_fmt(ui_LabelGeningRpmText, "%d", usRpm);
     lv_label_set_text_fmt(ui_LabelCarSpeedText, "%d", ucSpeed);
+    lv_label_set_text_fmt (ui_LabelGearNumText, pGearNum[eGear]);
+    lv_label_set_text_fmt(ui_LabelGearNumText1, pGearNum[eGear]);
     lv_arc_set_value(ui_ArcGeningRpm, (uint32_t)usRpm*100/RPM_MAX);
     lv_arc_set_value(ui_ArcCarSpeed, (uint16_t)ucSpeed*100/SPEED_MAX);
-    lv_label_set_text_fmt (ui_LabelGearNumText, pGearNum[calculate_gear(usRpm, ucSpeed)]);
-    lv_label_set_text_fmt(ui_LabelGearNumText1, pGearNum[calculate_gear(usRpm, ucSpeed)]);
+    lv_arc_set_value(ui_ArcGearNumBack, (uint16_t)eGear*100/5);
+
 
 
 #if EXAMPLE_PIN_NUM_BK_LIGHT >= 0
@@ -94,7 +98,9 @@ void ui_event_logo_background(lv_event_t * e)
         ESP_LOGI(TAG, "Logo LV_EVENT_CLICKED ! \n");
 
         _ui_screen_change(&ui_ScreenPageMain, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageMain_screen_init);  
-        lv_obj_del(gif_logo); //一定要手动删除gif，切换页面不会删除gif，不然占用资源
+#if USE_GIF_LOGO == 1
+        lv_obj_del(imageLogo); //一定要手动删除gif，切换页面不会删除gif，不然占用资源
+#endif
     }   
 }
 

@@ -18,10 +18,13 @@ extern "C" {
 #include "esp_log.h"
 #include "obd_data_cache.h"
 
+#define USE_GIF_LOGO 0
+
+#define COLOR_MITSUBISHI_RED 0XFF0204 //三菱红色
 
 void ui_ScreenPageLogo_screen_init(void);
 extern lv_obj_t * ui_ScreenPageLogo;
-extern lv_obj_t * gif_logo;
+extern lv_obj_t * imageLogo;
 
 // SCREEN: ui_ScreenPageMain
 void ui_ScreenPageMain_screen_init(void);
@@ -54,6 +57,7 @@ LV_IMG_DECLARE(gifSnake400);
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(ui_img_pngmainback3_png);    // assets/pngMainBack3.png
 LV_IMG_DECLARE(ui_img_pngmainback2_png);    // assets/pngMainBack2.png
+LV_IMG_DECLARE(pngLogoMITSUBISHI);    // assets/pngGearBack.png
 
 // FONTS
 LV_FONT_DECLARE(ui_font_FontBabyGearNumSize48);

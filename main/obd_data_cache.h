@@ -14,7 +14,6 @@ typedef enum {
     GEAR_3, 
     GEAR_4,
     GEAR_5,
-    GEAR_INVALID  // 无效数据
 } Gear;
 
 void obd_data_set_rpm(uint16_t rpm);
