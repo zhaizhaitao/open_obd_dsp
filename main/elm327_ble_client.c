@@ -30,6 +30,9 @@ static uint16_t s_cccd_handle = 0;
 static elm327_ble_callbacks_t s_cbs = {0};
 static char s_target_name[32] = "OBDII";
 
+// 增加全局 ready 标志
+static volatile bool s_elm_ready = true; // 初始允许发送首条 ATZ
+
 // 默认回调与轮询任务（可选）
 static void default_on_connected(void) { ESP_LOGI(TAG, "OBD BLE connected"); }
 static void default_on_disconnected(void) { ESP_LOGI(TAG, "OBD BLE disconnected"); }
@@ -37,6 +40,10 @@ static void default_on_raw_notify(const uint8_t *data, size_t len) {
     ESP_LOGI(TAG, "RAW (%d):", (int)len);
     for (size_t i = 0; i < len; ++i) printf("%02X ", data[i]);
     printf("str: %s \n", data);
+    // 若接收到 '>'，表示 ELM 准备好，可发送下一条
+    for (size_t i = 0; i < len; ++i) {
+        if (data[i] == '>') { s_elm_ready = true; break; }
+    }
 }
 static void default_on_parsed_rpm(uint16_t rpm) { ESP_LOGI(TAG, "RPM: %u", rpm); obd_data_set_rpm(rpm); }
 static void default_on_parsed_speed(uint8_t kmh) { ESP_LOGI(TAG, "SPEED: %u km/h", kmh); obd_data_set_speed(kmh); }
@@ -68,21 +75,17 @@ static void obd_poll_task(void *arg) {
         "ATS1\r",     // 空格 on/off
         "ATH0\r",     // 关闭头部数据（可选）ATH1是打開
         "ATAT1\r",    // 适应时序
-        "ATST 19\r",  // 设置超时（4*50=200ms，可按车况调 默認200ms） 这个后面改小/大试试；
-        "ATSP4\r",  //ATSP = Set Protocol（设置 OBD 协议） 0是自动 后面可以换一下试试 3ok 4ok效果好
+        "ATST 19\r",  // 设置超时（4*25=100ms，可按车况调 默認200ms） 这个后面改小/大试试；
+        "ATSP4\r",  //ATSP = Set Protocol（设置 OBD 协议） 0是自动 后面可以换一下试试 3ok 4ok（KWP2000）效果好
     };
 
     for (size_t i = 0; i < (sizeof(init_cmds) / sizeof(init_cmds[0])); ++i) {
-        size_t n = elm327_ble_ascii_cmd_to_bytes(init_cmds[i], buf, sizeof(buf));
-        if (n) { elm327_ble_send_command(buf, n); }
+        elm327_ble_send_ascii_blocking(init_cmds[i]);
         ESP_LOGI(TAG, " AT init Cmd send %s",init_cmds[i]);
-        vTaskDelay(pdMS_TO_TICKS(i == 0 ? 2000 : 100)); // ATZ 后多等一会
+        vTaskDelay(pdMS_TO_TICKS(30));
     }
-
-    vTaskDelay(pdMS_TO_TICKS(1000));
     // 协议选择后做一次能力探测，加速稳定
-    size_t n2 = elm327_ble_ascii_cmd_to_bytes("01 00\r", buf, sizeof(buf));
-    if (n2) { elm327_ble_send_command(buf, n2); }
+    elm327_ble_send_ascii_blocking("01 00\r");
     ESP_LOGI(TAG, " CMD 01 00 send \n");
     vTaskDelay(pdMS_TO_TICKS(100));
 
@@ -92,15 +95,13 @@ static void obd_poll_task(void *arg) {
         {
             case 0://发动机转速
             {
-                size_t n = elm327_ble_ascii_cmd_to_bytes("01 0C\r", buf, sizeof(buf));
-                elm327_ble_send_command(buf, n);
+                elm327_ble_send_ascii_blocking("01 0C\r");
                 ESP_LOGI(TAG, "Send 01 0C\r");
                 break;
             }
             case 1://车速
             {
-                size_t n = elm327_ble_ascii_cmd_to_bytes("01 0D\r", buf, sizeof(buf));
-                elm327_ble_send_command(buf, n);
+                elm327_ble_send_ascii_blocking("01 0D\r");
                 ESP_LOGI(TAG, "Send 01 0D\r");
                 break;
             }
@@ -124,12 +125,12 @@ static void obd_poll_task(void *arg) {
         }
  
         tick_count++;
-        if(tick_count > 1)
+        if(tick_count >= 2)
         {
             tick_count = 0;
         }
 
-        vTaskDelay(pdMS_TO_TICKS(400)); // 基础周期400ms
+        vTaskDelay(pdMS_TO_TICKS(200)); // 基础周期200ms
     }
 }
 
@@ -205,6 +206,28 @@ bool elm327_ble_send_command(const uint8_t *data, size_t len) {
                                              len, (uint8_t *)data,
                                              ESP_GATT_WRITE_TYPE_RSP, ESP_GATT_AUTH_REQ_NONE);
     return err == ESP_OK;
+}
+
+// 阻塞直到上一个响应结束（收到 '>'）后再发送
+bool elm327_ble_send_ascii_blocking(const char *ascii_cmd)
+{
+    uint32_t waited_ms = 0;
+    while (!s_elm_ready && waited_ms < 3000) {
+        vTaskDelay(pdMS_TO_TICKS(10));
+        waited_ms += 10;
+    }
+    if (!s_elm_ready) {
+        ESP_LOGW(TAG, "Timeout (>3s) waiting previous response, forcing send: %s", ascii_cmd);
+        s_elm_ready = true; // 避免死锁，继续发送
+    }
+    s_elm_ready = false;
+    uint8_t buf[32];
+    size_t n = elm327_ble_ascii_cmd_to_bytes(ascii_cmd, buf, sizeof(buf));
+    if (n) return elm327_ble_send_command(buf, n);
+    else {
+        s_elm_ready = true;
+        return false;
+    }
 }
 
 // 将 ASCII 指令(如 "01 0C\r")复制到输出缓冲区，同时去除空白字符，保持 ELM327 所需的 ASCII 格式
