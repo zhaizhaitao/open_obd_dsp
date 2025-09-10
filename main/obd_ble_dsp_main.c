@@ -31,6 +31,7 @@
 #include "esp_lcd_touch_cst816s.h"
 #include "bsp_ble/ble_hidd_demo.h"
 #include "bsp_ble_host/esp_hid_host_demo.h"
+#include "bsp_board.h"
 //***************** */
 #include "elm327_ble_client.h"
 
@@ -58,8 +59,7 @@ static SemaphoreHandle_t lvgl_mux = NULL;
 
 #if CONFIG_VIEWE_SMARTRING
 #define EXAMPLE_LCD_HOST               (SPI2_HOST)
-#define EXAMPLE_LCD_BK_LIGHT_ON_LEVEL  1
-#define EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL !EXAMPLE_LCD_BK_LIGHT_ON_LEVEL
+
 #define EXAMPLE_PIN_NUM_LCD_CS            (GPIO_NUM_7)
 #define EXAMPLE_PIN_NUM_LCD_PCLK          (GPIO_NUM_13)
 #define EXAMPLE_PIN_NUM_LCD_TE            (GPIO_NUM_10)
@@ -68,7 +68,7 @@ static SemaphoreHandle_t lvgl_mux = NULL;
 #define EXAMPLE_PIN_NUM_LCD_DATA2         (GPIO_NUM_14)
 #define EXAMPLE_PIN_NUM_LCD_DATA3         (GPIO_NUM_9)
 #define EXAMPLE_PIN_NUM_LCD_RST           (GPIO_NUM_11)
-#define EXAMPLE_PIN_NUM_BK_LIGHT          (GPIO_NUM_40)
+ 
 
 #if CONFIG_LCD_TOUCH_ENABLED
 #define EXAMPLE_TOUCH_HOST                (I2C_NUM_0)
@@ -286,6 +286,9 @@ static void example_lvgl_port_task(void *arg)
 {
     ESP_LOGI(TAG, "Starting LVGL task");
     uint32_t task_delay_ms = EXAMPLE_LVGL_TASK_MAX_DELAY_MS;
+    //获取当前时间
+    uint32_t start_current_time = xTaskGetTickCount();
+    uint8_t ucOnlyOnce = 0;
     while (1) {
         // Lock the mutex due to the LVGL APIs are not thread-safe
         if (example_lvgl_lock(-1)) {
@@ -347,7 +350,8 @@ void app_main(void)
     static lv_disp_drv_t disp_drv;      // contains callback functions
 
     if (EXAMPLE_PIN_NUM_BK_LIGHT >= 0) {
-        ESP_LOGI(TAG, "Turn off LCD backlight");
+        ESP_LOGI(TAG, "Init LCD backlight GPIO");
+        gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL);
         gpio_config_t bk_gpio_config = {
             .mode = GPIO_MODE_OUTPUT,
             .pin_bit_mask = 1ULL << EXAMPLE_PIN_NUM_BK_LIGHT
@@ -440,11 +444,6 @@ void app_main(void)
 
     ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_cst816s(tp_io_handle, &tp_cfg, &tp));
 #endif
-
-    if (EXAMPLE_PIN_NUM_BK_LIGHT >= 0) {
-        ESP_LOGI(TAG, "HF --Turn on LCD backlight");
-        gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
-    }
 
     ESP_LOGI(TAG, "Initialize LVGL library");
     lv_init();

@@ -5,6 +5,8 @@
 
 #include "ui.h"
 #include "ui_helpers.h"
+#include <driver/gpio.h>
+#include "../bsp_board.h"
 
 
 static const char *TAG = "ui";
@@ -51,6 +53,8 @@ void my_timerMain(lv_timer_t * timer)
     char *pGearNum[] = {"N","1", "2", "3", "4", "5"};
     static uint16_t usRpm = 0;
     static uint8_t ucSpeed = 0;
+    static uint8_t ucOnlyOnce = 0;
+    static uint32_t ulOpenLightTimeCnt = 0;
     usRpm   = obd_data_get_rpm();
     ucSpeed = obd_data_get_speed();
     lv_label_set_text_fmt(ui_LabelGeningRpmText, "%d", usRpm);
@@ -58,6 +62,20 @@ void my_timerMain(lv_timer_t * timer)
     lv_arc_set_value(ui_ArcGeningRpm, (uint32_t)usRpm*100/7000);
     lv_arc_set_value(ui_ArcCarSpeed, (uint16_t)ucSpeed*100/200);
     lv_label_set_text_fmt (ui_LabelGearNumText, pGearNum[calculate_gear(usRpm, ucSpeed)]);
+
+// #if EXAMPLE_PIN_NUM_BK_LIGHT >= 0
+//         //等待500ms后开背光，避免没有初始化完成就开背光，只执行一次
+//         if(ucOnlyOnce == 0)
+//         {
+//             if(ulOpenLightTimeCnt > 400 / 200)
+//             {
+//                 gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
+//                 ESP_LOGI(TAG, "Turn on LCD backlight");
+//                 ulOpenLightTimeCnt = 0;
+//                 ucOnlyOnce = 1;//只执行一次
+//             }
+//         }
+// #endif
 }
 ///////////////////// ANIMATIONS ////////////////////
 
@@ -91,6 +109,5 @@ void ui_init(void)
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_ScreenPageLogo);
 
-    lv_timer_t * timerMain;
-    timerMain = lv_timer_create(my_timerMain, 200, NULL);  //第二个参数（周期）是以毫秒为单位
+    lv_timer_create(my_timerMain, 200, NULL);  //200 ms 周期
 }
