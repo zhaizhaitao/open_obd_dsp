@@ -26,7 +26,7 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_height(ui_SpinnerMainPage, 466);
     lv_obj_set_align(ui_SpinnerMainPage, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_SpinnerMainPage, LV_OBJ_FLAG_CLICKABLE);      /// Flags
-    lv_obj_set_style_arc_color(ui_SpinnerMainPage, lv_color_hex( COLOR_SECONDARY_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_SpinnerMainPage, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_SpinnerMainPage, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_SpinnerMainPage, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
 

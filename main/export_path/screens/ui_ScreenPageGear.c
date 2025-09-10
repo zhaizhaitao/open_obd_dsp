@@ -54,7 +54,7 @@ void ui_ScreenPageGear_screen_init(void)
     lv_label_set_text(ui_GearPageArcLabelGearNumText, "N");
     lv_obj_set_style_text_color(ui_GearPageArcLabelGearNumText, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_GearPageArcLabelGearNumText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_GearPageArcLabelGearNumText, &ui_font_FontBabySize180, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_GearPageArcLabelGearNumText, &ui_font_FontBabySize156, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_GearPageArcGearNumBack, ui_event_gear_background, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_ScreenPageGear, ui_event_gear_background, LV_EVENT_GESTURE, NULL);

@@ -93,6 +93,7 @@ LV_FONT_DECLARE(ui_font_FontTaikongSize108);
 LV_FONT_DECLARE(ui_font_FontTaikongSize72);
 LV_FONT_DECLARE(ui_font_FontTaikongSize64);
 LV_FONT_DECLARE(ui_font_FontTaikongSize128);
+LV_FONT_DECLARE(ui_font_FontBabySize156);
 
 // UI INIT
 void ui_init(void);

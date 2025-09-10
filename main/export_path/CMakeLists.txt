@@ -18,6 +18,7 @@ SET(SOURCES screens/ui_ScreenPageMain.c
     fonts/ui_font_FontTaikongSize108.c
     fonts/ui_font_FontTaikongSize72.c
     fonts/ui_font_FontTaikongSize64.c
-    fonts/ui_font_FontTaikongSize128.c)
+    fonts/ui_font_FontTaikongSize128.c
+    fonts/ui_font_FontBabySize156.c)
 
 add_library(ui ${SOURCES})
