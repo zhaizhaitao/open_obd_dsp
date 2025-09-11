@@ -42,6 +42,7 @@ lv_obj_t * ui_ScreenPageGear;
 lv_obj_t * ui_SpinnerGearPage;
 lv_obj_t * ui_GearPageArcGearNumBack;
 lv_obj_t * ui_GearPageArcLabelGearNumText;
+lv_obj_t * ui_ImageGearBlackEar;
 // CUSTOM VARIABLES
 
 
@@ -52,6 +53,7 @@ lv_obj_t * ui_SpinnerRpmPage;
 lv_obj_t * ui_RpmPageArcRpmBack;
 lv_obj_t * ui_RpmPageArcLabelRpmText;
 lv_obj_t * ui_RpmPageArcLabelRpmUnit;
+lv_obj_t * ui_ImageRpmBlackEar;
 // CUSTOM VARIABLES
 
 
@@ -62,6 +64,7 @@ lv_obj_t * ui_SpinnerSpeedPage;
 lv_obj_t * ui_SpeedPageArcSpeedBack;
 lv_obj_t * ui_SpeedPageArcLabelSpeedText;
 lv_obj_t * ui_SpeedPageArcLabelSpeedUnit;
+lv_obj_t * ui_ImageSpeedBlackEar;
 // CUSTOM VARIABLES
 
 
@@ -69,7 +72,8 @@ lv_obj_t * ui_SpeedPageArcLabelSpeedUnit;
 void ui_ScreenPageEasterEgg_screen_init(void);
 lv_obj_t * ui_ScreenPageEasterEgg;
 lv_obj_t * ui_SpinnerEasterEgg;
-lv_obj_t * ScreenArcPageEasterEgg;
+lv_obj_t * ArcPageEasterEggBack;
+lv_obj_t * ui_ImageEggBlackEar;
 // CUSTOM VARIABLES
 
 // EVENTS
@@ -215,14 +219,22 @@ void ui_event_easter_egg_background(lv_event_t * e)
         lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&ui_ScreenPageSpeed, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageSpeed_screen_init);  
 #if USE_GIF_EASTER_EGG == 1
-        lv_obj_del(imageEasterEgg); //一定要手动删除gif，切换页面不会删除gif，不然占用资源
+        if(imageEasterEgg && lv_obj_is_valid(imageEasterEgg)) {
+            lv_obj_del(imageEasterEgg); // 避免重复删除导致崩溃
+            imageEasterEgg = NULL;
+            ui_ScreenPageEasterEgg = NULL;//要删除，不然不会重新初始化这个页面
+        }
 #endif
     }
     else if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
         lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&ui_ScreenPageMain, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageMain_screen_init);  
 #if USE_GIF_EASTER_EGG == 1
-        lv_obj_del(imageEasterEgg); //一定要手动删除gif，切换页面不会删除gif，不然占用资源
+        if(imageEasterEgg && lv_obj_is_valid(imageEasterEgg)) {
+            lv_obj_del(imageEasterEgg); // 避免重复删除导致崩溃
+            imageEasterEgg = NULL;
+            ui_ScreenPageEasterEgg = NULL;//要删除，不然不会重新初始化这个页面
+        }
 #endif
     }
 }

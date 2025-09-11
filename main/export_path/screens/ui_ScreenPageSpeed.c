@@ -18,11 +18,11 @@ void ui_ScreenPageSpeed_screen_init(void)
     lv_obj_set_height(ui_SpinnerSpeedPage, 466);
     lv_obj_set_align(ui_SpinnerSpeedPage, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_SpinnerSpeedPage, LV_OBJ_FLAG_CLICKABLE);      /// Flags
-    lv_obj_set_style_arc_color(ui_SpinnerSpeedPage, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_SpinnerSpeedPage, lv_color_hex(0xCC03C8), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_SpinnerSpeedPage, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_SpinnerSpeedPage, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_arc_color(ui_SpinnerSpeedPage, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_SpinnerSpeedPage, lv_color_hex(0xCC03C8), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_SpinnerSpeedPage, 0, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_SpinnerSpeedPage, 10, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
@@ -33,13 +33,13 @@ void ui_ScreenPageSpeed_screen_init(void)
     lv_obj_clear_flag(ui_SpeedPageArcSpeedBack, LV_OBJ_FLAG_CLICKABLE);      /// Flags
     lv_arc_set_value(ui_SpeedPageArcSpeedBack, 0);
     lv_arc_set_bg_angles(ui_SpeedPageArcSpeedBack, 0, 360);
-    lv_arc_set_rotation(ui_SpeedPageArcSpeedBack, 90);
-    lv_obj_set_style_arc_color(ui_SpeedPageArcSpeedBack, lv_color_hex( COLOR_SECONDARY_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_arc_set_rotation(ui_SpeedPageArcSpeedBack, 0);
+    lv_obj_set_style_arc_color(ui_SpeedPageArcSpeedBack, lv_color_hex(0x410641), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_SpeedPageArcSpeedBack, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_SpeedPageArcSpeedBack, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_rounded(ui_SpeedPageArcSpeedBack, false, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_arc_color(ui_SpeedPageArcSpeedBack, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_SpeedPageArcSpeedBack, lv_color_hex(0xCC03C8), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_SpeedPageArcSpeedBack, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_SpeedPageArcSpeedBack, 20, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_rounded(ui_SpeedPageArcSpeedBack, false, LV_PART_INDICATOR | LV_STATE_DEFAULT);
@@ -54,7 +54,7 @@ void ui_ScreenPageSpeed_screen_init(void)
     lv_obj_set_y(ui_SpeedPageArcLabelSpeedText, -4);
     lv_obj_set_align(ui_SpeedPageArcLabelSpeedText, LV_ALIGN_CENTER);
     lv_label_set_text(ui_SpeedPageArcLabelSpeedText, "125");
-    lv_obj_set_style_text_color(ui_SpeedPageArcLabelSpeedText, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_SpeedPageArcLabelSpeedText, lv_color_hex(0xCC03C8), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_SpeedPageArcLabelSpeedText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_SpeedPageArcLabelSpeedText, &ui_font_FontTaikongSize128, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -65,11 +65,22 @@ void ui_ScreenPageSpeed_screen_init(void)
     lv_obj_set_y(ui_SpeedPageArcLabelSpeedUnit, 76);
     lv_obj_set_align(ui_SpeedPageArcLabelSpeedUnit, LV_ALIGN_CENTER);
     lv_label_set_text(ui_SpeedPageArcLabelSpeedUnit, "km/h");
-    lv_obj_set_style_text_color(ui_SpeedPageArcLabelSpeedUnit, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_SpeedPageArcLabelSpeedUnit, lv_color_hex(0xCC03C8), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_SpeedPageArcLabelSpeedUnit, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_SpeedPageArcLabelSpeedUnit, &ui_font_FontTaikongSize56, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_ImageSpeedBlackEar = lv_img_create(ui_ScreenPageSpeed);
+    lv_img_set_src(ui_ImageSpeedBlackEar, &ui_img_pngblackear_png);
+    lv_obj_set_width(ui_ImageSpeedBlackEar, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_ImageSpeedBlackEar, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_ImageSpeedBlackEar, 0);
+    lv_obj_set_y(ui_ImageSpeedBlackEar, -142);
+    lv_obj_set_align(ui_ImageSpeedBlackEar, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_ImageSpeedBlackEar, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_ImageSpeedBlackEar, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
 
     lv_obj_add_event_cb(ui_SpeedPageArcSpeedBack, ui_event_speed_background, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_ScreenPageSpeed, ui_event_speed_background, LV_EVENT_GESTURE, NULL);
+
 }

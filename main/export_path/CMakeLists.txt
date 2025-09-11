@@ -7,6 +7,7 @@ SET(SOURCES screens/ui_ScreenPageMain.c
     components/ui_comp_hook.c
     ui_helpers.c
     images/ui_img_pngmainback_png.c
+    images/ui_img_pngblackear_png.c
     fonts/ui_font_FontBabyGearNumSize48.c
     fonts/ui_font_FontBabySize108.c
     fonts/ui_font_FontBabySize156.c

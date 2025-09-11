@@ -18,7 +18,7 @@ extern "C" {
 #include "app_obd_dsp/obd_data_cache.h"
 
 #define USE_GIF_LOGO        0
-#define USE_GIF_EASTER_EGG  0
+#define USE_GIF_EASTER_EGG  1
 
 #define COLOR_MITSUBISHI_RED    0XFF0204 //三菱红色
 #define COLOR_DOMIANT_PINK      0xCC03C8 //主色调粉色
@@ -55,6 +55,7 @@ extern lv_obj_t * ui_ScreenPageGear;
 extern lv_obj_t * ui_SpinnerGearPage;
 extern lv_obj_t * ui_GearPageArcGearNumBack;
 extern lv_obj_t * ui_GearPageArcLabelGearNumText;
+extern lv_obj_t * ui_ImageGearBlackEar;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_ScreenPageRpm
@@ -64,6 +65,7 @@ extern lv_obj_t * ui_SpinnerRpmPage;
 extern lv_obj_t * ui_RpmPageArcRpmBack;
 extern lv_obj_t * ui_RpmPageArcLabelRpmText;
 extern lv_obj_t * ui_RpmPageArcLabelRpmUnit;
+extern lv_obj_t * ui_ImageRpmBlackEar;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_ScreenPageSpeed
@@ -73,14 +75,16 @@ extern lv_obj_t * ui_SpinnerSpeedPage;
 extern lv_obj_t * ui_SpeedPageArcSpeedBack;
 extern lv_obj_t * ui_SpeedPageArcLabelSpeedText;
 extern lv_obj_t * ui_SpeedPageArcLabelSpeedUnit;
+extern lv_obj_t * ui_ImageSpeedBlackEar;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_ScreenPageEasterEgg
 void ui_ScreenPageEasterEgg_screen_init(void);
 extern lv_obj_t * ui_ScreenPageEasterEgg;
 extern lv_obj_t * ui_SpinnerEasterEgg;
-extern lv_obj_t * ScreenArcPageEasterEgg;
+extern lv_obj_t * ArcPageEasterEggBack;
 extern lv_obj_t * imageEasterEgg;
+extern lv_obj_t * ui_ImageEggBlackEar;
 // CUSTOM VARIABLES
 
 // EVENTS
@@ -94,6 +98,7 @@ LV_IMG_DECLARE(gifBlackLeopard);
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(ui_img_pngmainback_png);    // assets/pngMainBack.png
 LV_IMG_DECLARE(pngLogoMITSUBISHI);    // assets/pngLogoMITSUBISHI.png
+LV_IMG_DECLARE(ui_img_pngblackear_png);    // assets/pngBlackEar.png
 // FONTS
 LV_FONT_DECLARE(ui_font_FontBabyGearNumSize48);
 LV_FONT_DECLARE(ui_font_FontBabySize108);
