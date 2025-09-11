@@ -76,7 +76,7 @@ static void obd_poll_task(void *arg) {
         "ATS1\r",     // 空格 on/off
         "ATH0\r",     // 关闭头部数据（可选）ATH1是打開
         "ATAT1\r",    // 适应时序
-        "ATST FF\r",  // 设置超时（4*255=1020ms，可按车况调 默認200ms） 这个后面改小/大试试；
+        "ATST 19\r",  // 设置超时（4*255=1020ms，可按车况调 默認200ms） 这个后面改小/大试试；
         "ATSP4\r",  //ATSP = Set Protocol（设置 OBD 协议） 0是自动 后面可以换一下试试 3ok 4ok（KWP2000）效果好
     };
 
