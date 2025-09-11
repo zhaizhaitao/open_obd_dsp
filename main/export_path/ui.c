@@ -111,6 +111,21 @@ void my_timerMain(lv_timer_t * timer)
             }
         }
 #endif
+
+
+    //在logo 页面 3s后自动跳转主页面
+    if(ui_ScreenPageLogo)
+    {
+        static uint32_t ulLogoTimeCnt = 0;
+        ulLogoTimeCnt++;
+        if(ulLogoTimeCnt > 5000/200)
+        {
+            ulLogoTimeCnt = 0;
+            _ui_screen_change(&ui_ScreenPageMain, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageMain_screen_init);  
+            ui_ScreenPageLogo = NULL;
+        }
+    }
+
 }
 ///////////////////// ANIMATIONS ////////////////////
 
