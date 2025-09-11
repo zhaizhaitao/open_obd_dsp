@@ -3,17 +3,27 @@
 #include <stdbool.h>
 #include "esp_err.h"
 
+//主题风格结构体
+typedef struct {
+    uint8_t  theme;         //0 为自定义主题，1-9系统主题  1.pink_Big_face_cat   ...  默认为 1;
+    uint32_t user_theme_domiant_color;   //自定义主题主色调颜色
+    uint32_t user_theme_secondary_color;   //自定义主题副色调颜色
+    uint8_t rsv[5];        // 预留
+} theme_cfg_t;
+
 /*------------------ 用户配置（仅修改时写入） ------------------*/
 typedef struct {
     uint8_t protocol;      // 0: 自动, 1~9: 固定协议
-    uint8_t rsv[7];        // 预留
+    theme_cfg_t theme_cfg;   // 主题配置
+    uint8_t rsv[10];        // 预留
 } nvs_user_cfg_t;
 
 /*------------------ 运行统计（定期落盘） ------------------*/
 typedef struct {
     uint64_t odometer_m;   // 累计里程 (m)
+    uint64_t trip_m;       // 本次行程里程 (m)
     uint64_t run_time_s;   // 累计发动机运行时间 (s)
-    uint8_t  rsv[4];
+    uint8_t  rsv[10];
 } nvs_stat_t;
 
 esp_err_t nvs_storage_init(void);
@@ -26,3 +36,5 @@ esp_err_t nvs_cfg_set(const nvs_user_cfg_t *cfg);
 const nvs_stat_t * nvs_stat_get(void);
 void nvs_stat_add_odometer(uint32_t delta_m);
 void nvs_stat_add_runtime(uint32_t delta_s);
+void nvs_stat_add_trip(uint32_t delta_m);
+void nvs_stat_reset_trip(void);

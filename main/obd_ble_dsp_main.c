@@ -351,6 +351,10 @@ void app_main(void)
     /* 读取协议 */
     uint8_t proto = nvs_cfg_get()->protocol;
     ESP_LOGI("NVS","protocol=%d", proto);
+    /* 读取主题 */
+    theme_cfg_t str_theme = nvs_cfg_get()->theme_cfg;
+    ESP_LOGI("NVS","str_theme's .theme=%d, .user_theme_domiant_color=%d, .user_theme_secondary_color=%d", str_theme.theme, str_theme.user_theme_domiant_color, str_theme.user_theme_secondary_color);
+
     /* 修改协议 */
     nvs_user_cfg_t new_cfg = *nvs_cfg_get();// 复制配置
     new_cfg.protocol = 4;                // 例如固定 KWP2000 slow init

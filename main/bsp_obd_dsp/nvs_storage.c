@@ -6,17 +6,21 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include <string.h>
+#include "export_path/ui.h"
 
 #define TAG                   "nvs_storage"
 #define NS_CFG                "cfg"
 #define KEY_CFG               "settings"
 #define NS_STAT               "stat"
 #define KEY_STAT              "runtime"
-#define STAT_FLUSH_PERIOD_MS  5000
+#define STAT_FLUSH_PERIOD_MS  5000 //5s 落盘
 
 static nvs_user_cfg_t s_cfg =   { 
-                                    .protocol = 0//车辆OBD的协议类型选择 0:自动,1~9:固定协议 默认为0:自动
-                                };
+                        .protocol = 0, //车辆OBD的协议类型选择 0:自动,1~9:固定协议 默认为0:自动
+                        .theme_cfg.theme = 1,//主题配置
+                        .theme_cfg.user_theme_domiant_color = COLOR_DOMIANT_PINK,//主题主色调颜色
+                        .theme_cfg.user_theme_secondary_color = COLOR_SECONDARY_PINK,//主题副色调颜色
+                    };
 static nvs_stat_t     s_stat = {0};
 static bool           s_stat_dirty = false;
 static SemaphoreHandle_t s_mux;
@@ -65,6 +69,20 @@ void nvs_stat_add_odometer(uint32_t d){
 void nvs_stat_add_runtime(uint32_t d){
     xSemaphoreTake(s_mux,portMAX_DELAY);
     s_stat.run_time_s+=d;
+    s_stat_dirty=true;
+    xSemaphoreGive(s_mux);
+}
+
+void nvs_stat_add_trip(uint32_t d){
+    xSemaphoreTake(s_mux,portMAX_DELAY);
+    s_stat.trip_m+=d;
+    s_stat_dirty=true;
+    xSemaphoreGive(s_mux);
+}
+
+void nvs_stat_reset_trip(void){
+    xSemaphoreTake(s_mux,portMAX_DELAY);
+    s_stat.trip_m=0;
     s_stat_dirty=true;
     xSemaphoreGive(s_mux);
 }
