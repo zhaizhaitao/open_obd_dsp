@@ -13,7 +13,9 @@
     "ble_hidd_demo.h": "c",
     "lv_demos.h": "c",
     "elm327_ble_client.h": "c",
-    "obd_data_cache.h": "c"
+    "obd_data_cache.h": "c",
+    "nvs_storage.h": "c",
+    "bsp_board.h": "c"
   },
   "idf.portWin": "COM22",
   "idf.flashType": "UART",

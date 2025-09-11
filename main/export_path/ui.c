@@ -6,7 +6,7 @@
 #include "ui.h"
 #include "ui_helpers.h"
 #include <driver/gpio.h>
-#include "../bsp_board.h"
+#include "bsp_obd_dsp/bsp_board.h"
 
 
 static const char *TAG = "ui";

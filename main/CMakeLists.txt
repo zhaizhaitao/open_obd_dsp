@@ -8,7 +8,8 @@ idf_component_register(SRC_DIRS
                     "export_path/images"
                     "export_path/screens"
                     "export_path"
-                    "bsp_ble"   
+                    "app_obd_dsp"
+                    "bsp_obd_dsp"   
                     "bsp_ble_host"
                     INCLUDE_DIRS
                     ".")
