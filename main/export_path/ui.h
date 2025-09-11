@@ -14,7 +14,6 @@ extern "C" {
 
 #include "ui_helpers.h"
 #include "ui_events.h"
-#include "bsp_ble/ble_hidd_demo.h"
 #include "esp_log.h"
 #include "app_obd_dsp/obd_data_cache.h"
 

@@ -10,7 +10,6 @@ idf_component_register(SRC_DIRS
                     "export_path"
                     "app_obd_dsp"
                     "bsp_obd_dsp"   
-                    "bsp_ble_host"
                     INCLUDE_DIRS
                     ".")
 

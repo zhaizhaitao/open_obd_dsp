@@ -29,9 +29,6 @@
 #include "esp_err.h"
 #include "esp_lcd_sh8601.h"
 #include "esp_lcd_touch_cst816s.h"
-#include "bsp_ble/ble_hidd_demo.h"
-#include "bsp_ble_host/esp_hid_host_demo.h"
-
 #include "bsp_obd_dsp/bsp_board.h"
 #include "bsp_obd_dsp/elm327_ble_client.h"
 
