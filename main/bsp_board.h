@@ -3,6 +3,7 @@
 #define BSP_BOARD_H_
 
 #include "driver/gpio.h"
+#include "nvs_storage.h"
 
 // LCD 背光 GPIO 及电平定义
 

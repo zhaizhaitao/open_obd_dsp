@@ -497,14 +497,6 @@ static void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_
 
 void elm327_ble_start_default(const char *target_name) {
 
-    // 初始化 NVS 
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
-
     const elm327_ble_callbacks_t cbs = {
         .on_connected = default_on_connected,
         .on_disconnected = default_on_disconnected,

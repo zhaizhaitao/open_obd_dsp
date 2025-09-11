@@ -349,6 +349,23 @@ void app_main(void)
     static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
     static lv_disp_drv_t disp_drv;      // contains callback functions
 
+    nvs_storage_init();                  // 必须最先调用
+
+    /* 读取协议 */
+    uint8_t proto = nvs_cfg_get()->protocol;
+    ESP_LOGI("NVS","protocol=%d", proto);
+    /* 修改协议 */
+    nvs_user_cfg_t new_cfg = *nvs_cfg_get();// 复制配置
+    new_cfg.protocol = 4;                // 例如固定 KWP2000 slow init
+    nvs_cfg_set(&new_cfg);               // 立即写入
+
+    /* 行驶过程中累加统计 */
+    nvs_stat_add_odometer(120);          // +120 m
+    nvs_stat_add_runtime(1);             // +1 s
+    /* 读取统计 */
+    const nvs_stat_t *stat = nvs_stat_get();
+    ESP_LOGI("NVS","odometer=%d, runtime=%d", stat->odometer_m, stat->run_time_s);
+
     if (EXAMPLE_PIN_NUM_BK_LIGHT >= 0) {
         ESP_LOGI(TAG, "Init LCD backlight GPIO");
         gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL);
