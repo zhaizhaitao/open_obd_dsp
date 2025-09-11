@@ -44,6 +44,8 @@ static void default_on_raw_notify(const uint8_t *data, size_t len) {
     for (size_t i = 0; i < len; ++i) {
         if (data[i] == '>') { s_elm_ready = true; break; }
     }
+    //如果收到的是NO DATA 则认为ELM327没有准备好
+    if (strstr((const char *)data, "NO DATA") != NULL) { s_elm_ready = false; }
 }
 static void default_on_parsed_rpm(uint16_t rpm) { ESP_LOGI(TAG, "RPM: %u", rpm); obd_data_set_rpm(rpm); }
 static void default_on_parsed_speed(uint8_t kmh) { ESP_LOGI(TAG, "SPEED: %u km/h", kmh); obd_data_set_speed(kmh); }
@@ -74,7 +76,7 @@ static void obd_poll_task(void *arg) {
         "ATS1\r",     // 空格 on/off
         "ATH0\r",     // 关闭头部数据（可选）ATH1是打開
         "ATAT1\r",    // 适应时序
-        "ATST 19\r",  // 设置超时（4*25=100ms，可按车况调 默認200ms） 这个后面改小/大试试；
+        "ATST FF\r",  // 设置超时（4*255=1020ms，可按车况调 默認200ms） 这个后面改小/大试试；
         "ATSP4\r",  //ATSP = Set Protocol（设置 OBD 协议） 0是自动 后面可以换一下试试 3ok 4ok（KWP2000）效果好
     };
 
@@ -129,7 +131,7 @@ static void obd_poll_task(void *arg) {
             tick_count = 0;
         }
 
-        vTaskDelay(pdMS_TO_TICKS(200)); // 基础周期200ms
+        vTaskDelay(pdMS_TO_TICKS(250)); // 基础周期250ms
     }
 }
 
@@ -211,12 +213,12 @@ bool elm327_ble_send_command(const uint8_t *data, size_t len) {
 bool elm327_ble_send_ascii_blocking(const char *ascii_cmd)
 {
     uint32_t waited_ms = 0;
-    while (!s_elm_ready && waited_ms < 3000) {
+    while (!s_elm_ready && waited_ms < 1000) {
         vTaskDelay(pdMS_TO_TICKS(10));
         waited_ms += 10;
     }
     if (!s_elm_ready) {
-        ESP_LOGW(TAG, "Timeout (>3s) waiting previous response, forcing send: %s", ascii_cmd);
+        ESP_LOGW(TAG, "Timeout (>1s) waiting previous response, forcing send: %s", ascii_cmd);
         s_elm_ready = true; // 避免死锁，继续发送
     }
     s_elm_ready = false;
