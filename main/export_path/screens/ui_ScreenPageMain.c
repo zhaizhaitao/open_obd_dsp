@@ -96,17 +96,6 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_style_bg_color(ui_ArcGearNumBack, lv_color_hex(0xFFFFFF), LV_PART_KNOB | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_ArcGearNumBack, 0, LV_PART_KNOB | LV_STATE_DEFAULT);
 
-    ui_LabelGearNumText = lv_label_create(ui_ScreenPageMain);
-    lv_obj_set_width(ui_LabelGearNumText, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_LabelGearNumText, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_LabelGearNumText, 0);
-    lv_obj_set_y(ui_LabelGearNumText, 115);
-    lv_obj_set_align(ui_LabelGearNumText, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_LabelGearNumText, "N");
-    lv_obj_set_style_text_color(ui_LabelGearNumText, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_LabelGearNumText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_LabelGearNumText, &ui_font_FontBabySize56, LV_PART_MAIN | LV_STATE_DEFAULT);
-
     ui_LabelGeningRpmText = lv_label_create(ui_ScreenPageMain);
     lv_obj_set_width(ui_LabelGeningRpmText, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelGeningRpmText, LV_SIZE_CONTENT);    /// 1
@@ -151,7 +140,56 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_style_text_opa(ui_LabelCarSpeedUnitText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LabelCarSpeedUnitText, &ui_font_FontTaikongSize32, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_ContainerMainPageBottomBlock = lv_obj_create(ui_ScreenPageMain);
+    lv_obj_remove_style_all(ui_ContainerMainPageBottomBlock);
+    lv_obj_set_width(ui_ContainerMainPageBottomBlock, 320);
+    lv_obj_set_height(ui_ContainerMainPageBottomBlock, 130);
+    lv_obj_set_x(ui_ContainerMainPageBottomBlock, 0);
+    lv_obj_set_y(ui_ContainerMainPageBottomBlock, 115);
+    lv_obj_set_align(ui_ContainerMainPageBottomBlock, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_ContainerMainPageBottomBlock, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_LabelGearNumText = lv_label_create(ui_ContainerMainPageBottomBlock);
+    lv_obj_set_width(ui_LabelGearNumText, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LabelGearNumText, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_LabelGearNumText, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_LabelGearNumText, "N");
+    lv_obj_set_style_text_color(ui_LabelGearNumText, lv_color_hex(0xCF08EC), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_LabelGearNumText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_LabelGearNumText, &ui_font_FontBabySize56, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_ContainerMainPageMlieageBlock = lv_obj_create(ui_ContainerMainPageBottomBlock);
+    lv_obj_remove_style_all(ui_ContainerMainPageMlieageBlock);
+    lv_obj_set_width(ui_ContainerMainPageMlieageBlock, 320);
+    lv_obj_set_height(ui_ContainerMainPageMlieageBlock, 130);
+    lv_obj_set_align(ui_ContainerMainPageMlieageBlock, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_ContainerMainPageMlieageBlock, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_clear_flag(ui_ContainerMainPageMlieageBlock, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_LabelMainMlieageText = lv_label_create(ui_ContainerMainPageMlieageBlock);
+    lv_obj_set_width(ui_LabelMainMlieageText, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LabelMainMlieageText, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_LabelMainMlieageText, 0);
+    lv_obj_set_y(ui_LabelMainMlieageText, 25);
+    lv_obj_set_align(ui_LabelMainMlieageText, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_LabelMainMlieageText, "2000.0");
+    lv_obj_set_style_text_color(ui_LabelMainMlieageText, lv_color_hex(0xCF08EC), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_LabelMainMlieageText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_LabelMainMlieageText, &ui_font_FontTaikongSize64, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_LabelMainMieageNum = lv_label_create(ui_ContainerMainPageMlieageBlock);
+    lv_obj_set_width(ui_LabelMainMieageNum, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LabelMainMieageNum, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_LabelMainMieageNum, 0);
+    lv_obj_set_y(ui_LabelMainMieageNum, -40);
+    lv_obj_set_align(ui_LabelMainMieageNum, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_LabelMainMieageNum, "TRIP");
+    lv_obj_set_style_text_color(ui_LabelMainMieageNum, lv_color_hex(0xCF08EC), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_LabelMainMieageNum, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_LabelMainMieageNum, &ui_font_FontTaikongSize32, LV_PART_MAIN | LV_STATE_DEFAULT);
+
 
     lv_obj_add_event_cb(ui_ArcGearNumBack, ui_event_main_background, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_ScreenPageMain, ui_event_main_background, LV_EVENT_GESTURE, NULL);
+
 }

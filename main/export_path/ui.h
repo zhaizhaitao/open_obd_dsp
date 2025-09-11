@@ -17,7 +17,8 @@ extern "C" {
 #include "esp_log.h"
 #include "app_obd_dsp/obd_data_cache.h"
 
-#define USE_GIF_LOGO 0
+#define USE_GIF_LOGO        0
+#define USE_GIF_EASTER_EGG  0
 
 #define COLOR_MITSUBISHI_RED    0XFF0204 //三菱红色
 #define COLOR_DOMIANT_PINK      0xCC03C8 //主色调粉色
@@ -37,11 +38,15 @@ extern lv_obj_t * ui_SpinnerMainPage;
 extern lv_obj_t * ui_ArcGeningRpm;
 extern lv_obj_t * ui_ArcCarSpeed;
 extern lv_obj_t * ui_ArcGearNumBack;
-extern lv_obj_t * ui_LabelGearNumText;
 extern lv_obj_t * ui_LabelGeningRpmText;
 extern lv_obj_t * ui_LabelGeningRpmUnitText;
 extern lv_obj_t * ui_LabelCarSpeedText;
 extern lv_obj_t * ui_LabelCarSpeedUnitText;
+extern lv_obj_t * ui_ContainerMainPageBottomBlock;
+extern lv_obj_t * ui_LabelGearNumText;
+extern lv_obj_t * ui_ContainerMainPageMlieageBlock;
+extern lv_obj_t * ui_LabelMainMlieageText;
+extern lv_obj_t * ui_LabelMainMieageNum;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_ScreenPageGear
@@ -70,29 +75,40 @@ extern lv_obj_t * ui_SpeedPageArcLabelSpeedText;
 extern lv_obj_t * ui_SpeedPageArcLabelSpeedUnit;
 // CUSTOM VARIABLES
 
+// SCREEN: ui_ScreenPageEasterEgg
+void ui_ScreenPageEasterEgg_screen_init(void);
+extern lv_obj_t * ui_ScreenPageEasterEgg;
+extern lv_obj_t * ui_SpinnerEasterEgg;
+extern lv_obj_t * ScreenArcPageEasterEgg;
+extern lv_obj_t * imageEasterEgg;
+// CUSTOM VARIABLES
+
 // EVENTS
 
 extern lv_obj_t * ui____initial_actions0;
 LV_IMG_DECLARE(gifBlueLightLogo);    
 LV_IMG_DECLARE(gifSnake400);  
+LV_IMG_DECLARE(gifKaBiBaLaZip);    // assets/pngBlueLightLogo.png
+LV_IMG_DECLARE(gifCuteCatZip);
+LV_IMG_DECLARE(gifBlackLeopard);
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(ui_img_pngmainback_png);    // assets/pngMainBack.png
 LV_IMG_DECLARE(pngLogoMITSUBISHI);    // assets/pngLogoMITSUBISHI.png
 // FONTS
 LV_FONT_DECLARE(ui_font_FontBabyGearNumSize48);
 LV_FONT_DECLARE(ui_font_FontBabySize108);
+LV_FONT_DECLARE(ui_font_FontBabySize156);
 LV_FONT_DECLARE(ui_font_FontBabySize180);
 LV_FONT_DECLARE(ui_font_FontBabySize200);
 LV_FONT_DECLARE(ui_font_FontBabySize56);
+LV_FONT_DECLARE(ui_font_FontTaikongSize108);
+LV_FONT_DECLARE(ui_font_FontTaikongSize128);
 LV_FONT_DECLARE(ui_font_FontTaikongSize32);
 LV_FONT_DECLARE(ui_font_FontTaikongSize40);
 LV_FONT_DECLARE(ui_font_FontTaikongSize48);
 LV_FONT_DECLARE(ui_font_FontTaikongSize56);
-LV_FONT_DECLARE(ui_font_FontTaikongSize108);
-LV_FONT_DECLARE(ui_font_FontTaikongSize72);
 LV_FONT_DECLARE(ui_font_FontTaikongSize64);
-LV_FONT_DECLARE(ui_font_FontTaikongSize128);
-LV_FONT_DECLARE(ui_font_FontBabySize156);
+LV_FONT_DECLARE(ui_font_FontTaikongSize72);
 
 // UI INIT
 void ui_init(void);
@@ -101,7 +117,7 @@ void ui_event_main_background(lv_event_t * e);
 void ui_event_gear_background(lv_event_t * e);
 void ui_event_rpm_background(lv_event_t * e);
 void ui_event_speed_background(lv_event_t * e);
-
+void ui_event_easter_egg_background(lv_event_t * e);
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

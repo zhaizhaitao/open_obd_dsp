@@ -14,6 +14,7 @@ static const char *TAG = "ui";
 void ui_ScreenPageLogo_screen_init(void);
 lv_obj_t * ui_ScreenPageLogo;
 lv_obj_t * imageLogo;
+lv_obj_t * imageEasterEgg;
 
 // SCREEN: ui_ScreenPageMain
 void ui_ScreenPageMain_screen_init(void);
@@ -23,11 +24,15 @@ lv_obj_t * ui_SpinnerMainPage;
 lv_obj_t * ui_ArcGeningRpm;
 lv_obj_t * ui_ArcCarSpeed;
 lv_obj_t * ui_ArcGearNumBack;
-lv_obj_t * ui_LabelGearNumText;
 lv_obj_t * ui_LabelGeningRpmText;
 lv_obj_t * ui_LabelGeningRpmUnitText;
 lv_obj_t * ui_LabelCarSpeedText;
 lv_obj_t * ui_LabelCarSpeedUnitText;
+lv_obj_t * ui_ContainerMainPageBottomBlock;
+lv_obj_t * ui_LabelGearNumText;
+lv_obj_t * ui_ContainerMainPageMlieageBlock;
+lv_obj_t * ui_LabelMainMlieageText;
+lv_obj_t * ui_LabelMainMieageNum;
 // CUSTOM VARIABLES
 
 
@@ -57,6 +62,14 @@ lv_obj_t * ui_SpinnerSpeedPage;
 lv_obj_t * ui_SpeedPageArcSpeedBack;
 lv_obj_t * ui_SpeedPageArcLabelSpeedText;
 lv_obj_t * ui_SpeedPageArcLabelSpeedUnit;
+// CUSTOM VARIABLES
+
+
+// SCREEN: ui_ScreenPageEasterEgg
+void ui_ScreenPageEasterEgg_screen_init(void);
+lv_obj_t * ui_ScreenPageEasterEgg;
+lv_obj_t * ui_SpinnerEasterEgg;
+lv_obj_t * ScreenArcPageEasterEgg;
 // CUSTOM VARIABLES
 
 // EVENTS
@@ -156,7 +169,7 @@ void ui_event_main_background(lv_event_t * e)
     }
     else if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
         lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&ui_ScreenPageSpeed, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageSpeed_screen_init);  
+        _ui_screen_change(&ui_ScreenPageEasterEgg, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageEasterEgg_screen_init);  
     }
 }
 void ui_event_gear_background(lv_event_t * e)
@@ -192,7 +205,25 @@ void ui_event_speed_background(lv_event_t * e)
     }
     else if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
         lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_ScreenPageEasterEgg, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageEasterEgg_screen_init);  
+    }
+}
+void ui_event_easter_egg_background(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_ScreenPageSpeed, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageSpeed_screen_init);  
+#if USE_GIF_EASTER_EGG == 1
+        lv_obj_del(imageEasterEgg); //一定要手动删除gif，切换页面不会删除gif，不然占用资源
+#endif
+    }
+    else if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
+        lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&ui_ScreenPageMain, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageMain_screen_init);  
+#if USE_GIF_EASTER_EGG == 1
+        lv_obj_del(imageEasterEgg); //一定要手动删除gif，切换页面不会删除gif，不然占用资源
+#endif
     }
 }
 ///////////////////// SCREENS ////////////////////
