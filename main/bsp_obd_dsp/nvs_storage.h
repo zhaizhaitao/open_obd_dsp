@@ -22,8 +22,10 @@ typedef struct {
 typedef struct {
     uint64_t odometer_m;   // 累计里程 (m)
     uint64_t trip_m;       // 本次行程里程 (m)
-    uint64_t run_time_s;   // 累计发动机运行时间 (s)
-    uint8_t  rsv[10];
+    uint64_t run_time_s;   // 累计行驶时间 (s)
+    uint16_t max_speed_kmh; // 最大速度km/h
+    uint16_t avg_speed_kmh;
+    uint8_t  rsv[6];
 } nvs_stat_t;
 
 esp_err_t nvs_storage_init(void);
@@ -38,3 +40,5 @@ void nvs_stat_add_odometer(uint32_t delta_m);
 void nvs_stat_add_runtime(uint32_t delta_s);
 void nvs_stat_add_trip(uint32_t delta_m);
 void nvs_stat_reset_trip(void);
+void nvs_stat_update_speed(uint8_t speed_kmh,uint32_t dt_ms);
+nvs_stat_t nvs_stat_get_mileage(void);

@@ -31,6 +31,7 @@
 #include "esp_lcd_touch_cst816s.h"
 #include "bsp_obd_dsp/bsp_board.h"
 #include "bsp_obd_dsp/elm327_ble_client.h"
+#include "app_obd_dsp/obd_data_cache.h"
 
 static const char *TAG = "example";
 
@@ -355,14 +356,6 @@ void app_main(void)
     theme_cfg_t str_theme = nvs_cfg_get()->theme_cfg;
     ESP_LOGI("NVS","str_theme's .theme=%d, .user_theme_domiant_color=%d, .user_theme_secondary_color=%d", str_theme.theme, str_theme.user_theme_domiant_color, str_theme.user_theme_secondary_color);
 
-    /* 修改协议 */
-    nvs_user_cfg_t new_cfg = *nvs_cfg_get();// 复制配置
-    new_cfg.protocol = 4;                // 例如固定 KWP2000 slow init
-    nvs_cfg_set(&new_cfg);               // 立即写入
-
-    /* 行驶过程中累加统计 */
-    nvs_stat_add_odometer(120);          // +120 m
-    nvs_stat_add_runtime(1);             // +1 s
     /* 读取统计 */
     const nvs_stat_t *stat = nvs_stat_get();
     ESP_LOGI("NVS","odometer=%d, runtime=%d", stat->odometer_m, stat->run_time_s);
@@ -522,4 +515,8 @@ void app_main(void)
     
     // 一键启动：默认日志与周期轮询（010C/010D）
     elm327_ble_start_default("OBDII");
+
+    //创建里程统计任务
+    vMileageDataStatisticTask();
+
 }

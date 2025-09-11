@@ -3,7 +3,8 @@
 #include "freertos/portmacro.h"
 #include "freertos/task.h"
 #include <math.h>
-
+#include "bsp_obd_dsp/nvs_storage.h"
+#include "esp_log.h"
 // 车辆常量定义 (根据您的东南菱悦V3 11款手动挡 195/55R15轮胎)
 #define FINAL_DRIVE_RATIO      4.052f
 #define TIRE_ROLLING_RADIUS_M  0.298f
@@ -15,7 +16,7 @@
 typedef struct {
     float min_ratio;
     float max_ratio;
-    Gear gear;
+    enGear gear;
 } GearRatioRange;
 
 // 各档位理论总传动比范围（根据您的车辆参数预设）
@@ -105,7 +106,6 @@ uint8_t obd_data_get_speed(void)
     // 4. 更新平滑值
     smooth += alpha * ((float)raw - smooth);
     last_tick = now_tick;
-
     return (uint8_t)(smooth + 0.5f); // 四舍五入返回
 }
 
@@ -116,8 +116,8 @@ uint8_t obd_data_get_speed(void)
  * @param speed 车速 (km/h)
  * @return 计算出的档位
  */
-Gear calculate_gear(float rpm, float speed) {
-    static Gear s_last_gear = GEAR_NEUTRAL;
+enGear calculate_gear(float rpm, float speed) {
+    static enGear s_last_gear = GEAR_NEUTRAL;
     // 1. 检查输入数据有效性
     if (rpm <= 0 || speed <= 0) {
         s_last_gear = GEAR_NEUTRAL;
@@ -149,4 +149,45 @@ Gear calculate_gear(float rpm, float speed) {
     return s_last_gear;
 }
 
+
+/**
+ * @brief 里程统计任务
+ * @param pvParameter 参数
+ * @return 无
+ * @note  
+ * @note 里程统计任务
+ */
+void mileage_stat_task(void *pvParameter)
+{
+    static uint16_t usPrintCnt = 0;
+    while(1)
+    {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        nvs_stat_update_speed(obd_data_get_speed(), 1000);//1s更新一次
+        
+        if(obd_data_get_speed() > 0)
+        {
+            usPrintCnt++;
+            if(usPrintCnt > 20)//20s打印一次
+            {
+                usPrintCnt = 0;
+                 //odo 统计 打印
+                nvs_stat_t stat = nvs_stat_get_mileage();
+                ESP_LOGI("MileageStat", " odometer: %lld, trip: %lld, run_time: %lld, max_speed: %d, avg_speed: %d, speed: %d", stat.odometer_m, stat.trip_m, stat.run_time_s, stat.max_speed_kmh, stat.avg_speed_kmh, obd_data_get_speed());
+            }
+        }
+    }
+}
+
+/**
+ * @brief 初始化里程统计任务
+ * @return 无
+ * @note  
+ * @note 初始化里程统计任务
+ */
+void vMileageDataStatisticTask(void)
+{
+    ESP_LOGI("MileageStat", "MileageStatTask Init Start");
+    xTaskCreate(mileage_stat_task, "mileage_stat", 4096, NULL, 4, NULL);
+}
   

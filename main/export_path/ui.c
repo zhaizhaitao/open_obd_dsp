@@ -73,7 +73,7 @@ void my_timerMain(lv_timer_t * timer)
     char *pGearNum[] = {"N","1", "2", "3", "4", "5"};
     static uint16_t usRpm = 0;
     static uint8_t ucSpeed = 0;
-    static Gear eGear = GEAR_NEUTRAL;
+    static enGear eGear = GEAR_NEUTRAL;
     static uint8_t ucOnlyOnce = 0;
     static uint32_t ulOpenLightTimeCnt = 0;
     usRpm   = obd_data_get_rpm();
