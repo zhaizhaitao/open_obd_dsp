@@ -360,7 +360,7 @@ void app_main(void)
 
     /* 读取统计 */
     const nvs_stat_t *stat = nvs_stat_get();
-    ESP_LOGI("NVS","odometer=%d, runtime=%d", stat->odometer_m, stat->run_time_s);
+    ESP_LOGI("NVS","odometer=%d, trip=%d, max_speed=%d, avg_speed=%d, runtime=%d", stat->odometer_m, stat->trip_m, stat->max_speed_kmh, stat->avg_speed_kmh, stat->run_time_s);
 
     if (EXAMPLE_PIN_NUM_BK_LIGHT >= 0) {
         ESP_LOGI(TAG, "Init LCD backlight GPIO");
