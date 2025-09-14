@@ -172,13 +172,13 @@ void my_timerMain(lv_timer_t * timer)
         case INFO_TRIP:
             lv_obj_clear_flag(ui_ContainerMainPageMlieageBlock, LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(ui_LabelGearNumText, LV_OBJ_FLAG_HIDDEN);
-            lv_label_set_text_fmt(ui_LabelMainMlieageText, "%d.%d", stat.trip_m/1000, stat.trip_m/100%10);
+            lv_label_set_text_fmt(ui_LabelMainMlieageText, "%lld.%lld", stat.trip_m/1000, stat.trip_m/100%10);
             lv_label_set_text(ui_LabelMainMieageNum, "TRIP");
             break;
         case INFO_ODO:
             lv_obj_clear_flag(ui_ContainerMainPageMlieageBlock, LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(ui_LabelGearNumText, LV_OBJ_FLAG_HIDDEN);
-            lv_label_set_text_fmt(ui_LabelMainMlieageText, "%d", stat.odometer_m/1000);
+            lv_label_set_text_fmt(ui_LabelMainMlieageText, "%lld", stat.odometer_m/1000);
             lv_label_set_text(ui_LabelMainMieageNum, "ODO");
             break;
         case INFO_MAX:
@@ -198,7 +198,7 @@ void my_timerMain(lv_timer_t * timer)
             lv_obj_add_flag(ui_LabelGearNumText, LV_OBJ_FLAG_HIDDEN);
             uint32_t hrs = stat.run_time_s/3600;
             uint32_t mins = (stat.run_time_s%3600)/60;
-            lv_label_set_text_fmt(ui_LabelMainMlieageText, "%02d:%02d", hrs, mins);
+            lv_label_set_text_fmt(ui_LabelMainMlieageText, "%02ld:%02ld", hrs, mins);
             lv_label_set_text(ui_LabelMainMieageNum, "TIME");
             break;
         default: break;

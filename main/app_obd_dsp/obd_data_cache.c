@@ -2,6 +2,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/portmacro.h"
 #include "freertos/task.h"
+#include "esp_timer.h"
 #include <math.h>
 #include "bsp_obd_dsp/nvs_storage.h"
 #include "esp_log.h"
@@ -157,24 +158,17 @@ enGear calculate_gear(float rpm, float speed) {
  * @note  
  * @note 里程统计任务
  */
-void mileage_stat_task(void *pvParameter)
+static void mileage_timer_cb(void* arg)
 {
     static uint16_t usPrintCnt = 0;
-    while(1)
-    {
-        vTaskDelay(pdMS_TO_TICKS(1000));
-        nvs_stat_update_speed(obd_data_get_speed(), 1000);//1s更新一次
-        
-        if(obd_data_get_speed() > 0)
-        {
-            usPrintCnt++;
-            if(usPrintCnt > 20)//20s打印一次
-            {
-                usPrintCnt = 0;
-                 //odo 统计 打印
-                nvs_stat_t stat = nvs_stat_get_mileage();
-                ESP_LOGI("MileageStat", " odometer: %lld, trip: %lld, run_time: %lld, max_speed: %d, avg_speed: %d, speed: %d", stat.odometer_m, stat.trip_m, stat.run_time_s, stat.max_speed_kmh, stat.avg_speed_kmh, obd_data_get_speed());
-            }
+    nvs_stat_update_speed(obd_data_get_speed(), 1000);
+
+    if(obd_data_get_speed() > 0){
+        usPrintCnt++;
+        if(usPrintCnt >= 20){
+            usPrintCnt = 0;
+            nvs_stat_t stat = nvs_stat_get_mileage();
+            ESP_LOGI("MileageStat", " odometer: %lld, trip: %lld, run_time: %lld, max_speed: %d, avg_speed: %d, speed: %d", stat.odometer_m, stat.trip_m, stat.run_time_s, stat.max_speed_kmh, stat.avg_speed_kmh, obd_data_get_speed());
         }
     }
 }
@@ -188,6 +182,16 @@ void mileage_stat_task(void *pvParameter)
 void vMileageDataStatisticTask(void)
 {
     ESP_LOGI("MileageStat", "MileageStatTask Init Start");
-    xTaskCreate(mileage_stat_task, "mileage_stat", 4096, NULL, 4, NULL);
+    static esp_timer_handle_t s_timer = NULL;
+    if(!s_timer){
+        const esp_timer_create_args_t args={
+            .callback = mileage_timer_cb,
+            .arg = NULL,
+            .name = "mile_stat"
+        };
+        if(esp_timer_create(&args,&s_timer)==ESP_OK){
+            esp_timer_start_periodic(s_timer, 1000000); //1s
+        }
+    }
 }
   
