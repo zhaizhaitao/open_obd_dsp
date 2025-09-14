@@ -75,6 +75,15 @@ extern lv_obj_t * ui_SpeedPageArcLabelSpeedText;
 extern lv_obj_t * ui_SpeedPageArcLabelSpeedUnit;
 extern lv_obj_t * ui_ImageSpeedBlackEar;
 // CUSTOM VARIABLES
+// SCREEN: ui_ScreenPageODBProtocal
+void ui_ScreenPageODBProtocal_screen_init(void);
+extern lv_obj_t * ui_ScreenPageODBProtocal;
+extern lv_obj_t * ui_SpinnerODBProtocalEgg;
+extern lv_obj_t * ui_ArcPageODBProtocalBack;
+extern lv_obj_t * ui_RollerODBProtocalChoose;
+extern lv_obj_t * ui_ImageODBProtocalBlackEar;
+extern lv_obj_t * ui_LabelOBDIIText;
+extern lv_obj_t * ui_LabelSureTipText;
 
 // SCREEN: ui_ScreenPageEasterEgg
 void ui_ScreenPageEasterEgg_screen_init(void);
@@ -112,6 +121,15 @@ LV_FONT_DECLARE(ui_font_FontTaikongSize48);
 LV_FONT_DECLARE(ui_font_FontTaikongSize56);
 LV_FONT_DECLARE(ui_font_FontTaikongSize64);
 LV_FONT_DECLARE(ui_font_FontTaikongSize72);
+LV_FONT_DECLARE(ui_font_FontTypoderSize16);
+LV_FONT_DECLARE(ui_font_FontTypoderSize20);
+LV_FONT_DECLARE(ui_font_FontTypoderSize24);
+LV_FONT_DECLARE(ui_font_FontTypoderSize28);
+LV_FONT_DECLARE(ui_font_FontTypoderSize32);
+LV_FONT_DECLARE(ui_font_FontTypoderSize36);
+LV_FONT_DECLARE(ui_font_FontTypoderSize40);
+LV_FONT_DECLARE(ui_font_FontTypoderSize44);
+
 
 // UI INIT
 void ui_init(void);
@@ -120,6 +138,7 @@ void ui_event_main_background(lv_event_t * e);
 void ui_event_gear_background(lv_event_t * e);
 void ui_event_rpm_background(lv_event_t * e);
 void ui_event_speed_background(lv_event_t * e);
+void ui_event_obd_prot_background(lv_event_t * e);
 void ui_event_easter_egg_background(lv_event_t * e);
 #ifdef __cplusplus
 } /*extern "C"*/

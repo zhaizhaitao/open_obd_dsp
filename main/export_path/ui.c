@@ -8,6 +8,7 @@
 #include <driver/gpio.h>
 #include "bsp_obd_dsp/bsp_board.h"
 #include "bsp_obd_dsp/nvs_storage.h"
+#include "esp_system.h"
 
 
 static const char *TAG = "ui";
@@ -88,14 +89,26 @@ lv_obj_t * ArcPageEasterEggBack;
 lv_obj_t * ui_ImageEggBlackEar;
 // CUSTOM VARIABLES
 
+// SCREEN: ui_ScreenPageODBProtocal
+void ui_ScreenPageODBProtocal_screen_init(void);
+lv_obj_t * ui_ScreenPageODBProtocal;
+lv_obj_t * ui_SpinnerODBProtocalEgg;
+lv_obj_t * ui_ArcPageODBProtocalBack;
+lv_obj_t * ui_RollerODBProtocalChoose;
+lv_obj_t * ui_ImageODBProtocalBlackEar;
+lv_obj_t * ui_LabelOBDIIText;
+lv_obj_t * ui_LabelSureTipText;
+
 // EVENTS
 lv_obj_t * ui____initial_actions0;
 
 
 static uint16_t usClearTripDataTimeCnt = 0;
+static uint16_t usSaveProtTimeCnt = 0; //OBD协议保存计时
 
 // IMAGES AND IMAGE SETS
- #define CLEAR_TRIP_TIME 2000 //清除TRIP数据长按时间，单位ms
+#define CLEAR_TRIP_TIME 2000 //清除TRIP数据长按时间，单位ms
+#define SAVE_PROTOCOL_TIME 2000 //保存协议长按时间ms
  
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #define RPM_MAX 5000
@@ -215,13 +228,27 @@ void my_timerMain(lv_timer_t * timer)
 void ui_event_logo_background(lv_event_t * e)
 {  
     lv_event_code_t event_code = lv_event_get_code(e);
-    if(event_code == LV_EVENT_CLICKED) {//触摸点击
-        ESP_LOGI(TAG, "Logo LV_EVENT_CLICKED ! \n");
+    if(event_code == LV_EVENT_CLICKED) {
+        static uint32_t last_click_tick = 0;
+        static uint8_t  click_cnt = 0;
+        uint32_t now = lv_tick_get();
+        if(now - last_click_tick < 400){
+            click_cnt++;
+        }else{
+            click_cnt = 1;
+        }
+        last_click_tick = now;
 
-        _ui_screen_change(&ui_ScreenPageMain, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageMain_screen_init);  
+        if(click_cnt >= 2){
+            click_cnt = 0;
+            _ui_screen_change(&ui_ScreenPageODBProtocal, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageODBProtocal_screen_init);
+            ui_ScreenPageLogo = NULL;
 #if USE_GIF_LOGO == 1
-        lv_obj_del(imageLogo); //一定要手动删除gif，切换页面不会删除gif，不然占用资源
+            lv_obj_del(imageLogo);
 #endif
+        }  
+
+        ESP_LOGI(TAG, "Logo LV_EVENT_CLICKED ! \n");
     }   
 }
 
@@ -351,8 +378,35 @@ void ui_init(void)
     ui_ScreenPageGear_screen_init();
     ui_ScreenPageRpm_screen_init();
     ui_ScreenPageSpeed_screen_init();
+    ui_ScreenPageODBProtocal_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_ScreenPageLogo);
 
     lv_timer_create(my_timerMain, 200, NULL);  //200 ms 周期
+}
+
+/* OBD 协议页面事件 */
+void ui_event_obd_prot_background(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    if(code == LV_EVENT_GESTURE){
+        lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
+        if(dir == LV_DIR_LEFT || dir == LV_DIR_RIGHT){
+            lv_indev_wait_release(lv_indev_get_act());
+            _ui_screen_change(&ui_ScreenPageMain, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageMain_screen_init);
+        }
+    }else if(code == LV_EVENT_LONG_PRESSED){
+        usSaveProtTimeCnt = 0;
+    }else if(code == LV_EVENT_LONG_PRESSED_REPEAT){
+        usSaveProtTimeCnt += 100; // 该事件每 100 ms 触发一次
+        if(usSaveProtTimeCnt >= SAVE_PROTOCOL_TIME/100){
+            usSaveProtTimeCnt = 0;
+            nvs_user_cfg_t cfg = *nvs_cfg_get();
+            cfg.protocol = lv_roller_get_selected(ui_RollerODBProtocalChoose);
+            nvs_cfg_set(&cfg);
+            esp_restart();
+        }
+    }else if(code == LV_EVENT_RELEASED){
+        usSaveProtTimeCnt = 0;
+    }
 }

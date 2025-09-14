@@ -10,6 +10,7 @@
 #include "nvs_flash.h"
 #include "app_obd_dsp/obd_data_cache.h"
 #include <string.h>
+#include "nvs_storage.h"
 
 // UUID 常量
 #define UUID16_OBD_SERVICE 0xFFF0
@@ -68,7 +69,10 @@ static void obd_poll_task(void *arg) {
     }
 
     uint32_t tick_count = 0;
-    // 初始化阶段：发送 ELM327 AT 指令
+    char atsp_cmd[16];
+    const nvs_user_cfg_t *cfg = nvs_cfg_get();
+    snprintf(atsp_cmd, sizeof(atsp_cmd), "ATSP%d\r", cfg->protocol);
+
     const char *init_cmds[] = {
         "ATZ\r",      // 复位
         "ATE0\r",     // Echo off
@@ -76,8 +80,8 @@ static void obd_poll_task(void *arg) {
         "ATS1\r",     // 空格 on/off
         "ATH0\r",     // 关闭头部数据（可选）ATH1是打開
         "ATAT1\r",    // 适应时序
-        "ATST 19\r",  // 设置超时（4*255=1020ms，可按车况调 默認200ms） 这个后面改小/大试试；
-        "ATSP4\r",  //ATSP = Set Protocol（设置 OBD 协议） 0是自动 后面可以换一下试试 3ok 4ok（KWP2000）效果好
+        "ATST 19\r",  // 设置超时
+        atsp_cmd,       // 设置协议
     };
 
     for (size_t i = 0; i < (sizeof(init_cmds) / sizeof(init_cmds[0])); ++i) {

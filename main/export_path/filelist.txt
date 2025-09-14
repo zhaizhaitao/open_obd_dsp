@@ -3,6 +3,7 @@ screens/ui_ScreenPageGear.c
 screens/ui_ScreenPageRpm.c
 screens/ui_ScreenPageSpeed.c
 screens/ui_ScreenPageEasterEgg.c
+screens/ui_ScreenPageODBProtocal.c
 ui.c
 components/ui_comp_hook.c
 ui_helpers.c
@@ -22,3 +23,11 @@ fonts/ui_font_FontTaikongSize48.c
 fonts/ui_font_FontTaikongSize56.c
 fonts/ui_font_FontTaikongSize64.c
 fonts/ui_font_FontTaikongSize72.c
+fonts/ui_font_FontTypoderSize16.c
+fonts/ui_font_FontTypoderSize20.c
+fonts/ui_font_FontTypoderSize24.c
+fonts/ui_font_FontTypoderSize28.c
+fonts/ui_font_FontTypoderSize32.c
+fonts/ui_font_FontTypoderSize36.c
+fonts/ui_font_FontTypoderSize40.c
+fonts/ui_font_FontTypoderSize44.c
