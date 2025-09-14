@@ -35,8 +35,6 @@ void ui_ScreenPageMain_screen_init(void);
 extern lv_obj_t * ui_ScreenPageMain;
 extern lv_obj_t * ui_ImageMainPageback;
 extern lv_obj_t * ui_SpinnerMainPage;
-extern lv_obj_t * ui_ArcGeningRpm;
-extern lv_obj_t * ui_ArcCarSpeed;
 extern lv_obj_t * ui_ArcGearNumBack;
 extern lv_obj_t * ui_LabelGeningRpmText;
 extern lv_obj_t * ui_LabelGeningRpmUnitText;

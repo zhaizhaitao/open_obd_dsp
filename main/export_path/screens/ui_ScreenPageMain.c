@@ -26,49 +26,6 @@ void ui_ScreenPageMain_screen_init(void)
     lv_obj_set_style_arc_opa(ui_SpinnerMainPage, 0, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_SpinnerMainPage, 10, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
-    ui_ArcGeningRpm = lv_arc_create(ui_ScreenPageMain);
-    lv_obj_set_width(ui_ArcGeningRpm, 440);
-    lv_obj_set_height(ui_ArcGeningRpm, 440);
-    lv_obj_set_align(ui_ArcGeningRpm, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_ArcGeningRpm, LV_OBJ_FLAG_HIDDEN);     /// Flags
-    lv_obj_clear_flag(ui_ArcGeningRpm, LV_OBJ_FLAG_CLICKABLE);      /// Flags
-    lv_arc_set_value(ui_ArcGeningRpm, 50);
-    lv_arc_set_bg_angles(ui_ArcGeningRpm, 155, 265);
-    lv_obj_set_style_arc_color(ui_ArcGeningRpm, lv_color_hex( COLOR_SECONDARY_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_opa(ui_ArcGeningRpm, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_width(ui_ArcGeningRpm, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_rounded(ui_ArcGeningRpm, false, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    lv_obj_set_style_arc_color(ui_ArcGeningRpm, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_opa(ui_ArcGeningRpm, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_width(ui_ArcGeningRpm, 20, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_rounded(ui_ArcGeningRpm, false, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-
-    lv_obj_set_style_bg_color(ui_ArcGeningRpm, lv_color_hex(0xFFFFFF), LV_PART_KNOB | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_ArcGeningRpm, 0, LV_PART_KNOB | LV_STATE_DEFAULT);
-
-    ui_ArcCarSpeed = lv_arc_create(ui_ScreenPageMain);
-    lv_obj_set_width(ui_ArcCarSpeed, 440);
-    lv_obj_set_height(ui_ArcCarSpeed, 440);
-    lv_obj_set_align(ui_ArcCarSpeed, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_ArcCarSpeed, LV_OBJ_FLAG_HIDDEN);     /// Flags
-    lv_obj_clear_flag(ui_ArcCarSpeed, LV_OBJ_FLAG_CLICKABLE);      /// Flags
-    lv_arc_set_value(ui_ArcCarSpeed, 50);
-    lv_arc_set_bg_angles(ui_ArcCarSpeed, 275, 25);
-    lv_arc_set_mode(ui_ArcCarSpeed, LV_ARC_MODE_REVERSE);
-    lv_obj_set_style_arc_color(ui_ArcCarSpeed, lv_color_hex( COLOR_SECONDARY_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_opa(ui_ArcCarSpeed, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_width(ui_ArcCarSpeed, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_rounded(ui_ArcCarSpeed, false, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    lv_obj_set_style_arc_color(ui_ArcCarSpeed, lv_color_hex( COLOR_DOMIANT_PINK), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_opa(ui_ArcCarSpeed, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_width(ui_ArcCarSpeed, 20, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_rounded(ui_ArcCarSpeed, false, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-
-    lv_obj_set_style_bg_color(ui_ArcCarSpeed, lv_color_hex(0xFFFFFF), LV_PART_KNOB | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_ArcCarSpeed, 0, LV_PART_KNOB | LV_STATE_DEFAULT);
-
     ui_ArcGearNumBack = lv_arc_create(ui_ScreenPageMain);
     lv_obj_set_width(ui_ArcGearNumBack, 440);
     lv_obj_set_height(ui_ArcGearNumBack, 440);
@@ -77,6 +34,7 @@ void ui_ScreenPageMain_screen_init(void)
     lv_arc_set_value(ui_ArcGearNumBack, 0);
     lv_arc_set_bg_angles(ui_ArcGearNumBack, 0, 360);
     lv_arc_set_mode(ui_ArcGearNumBack, LV_ARC_MODE_REVERSE);
+    lv_arc_set_rotation(ui_ArcGearNumBack, 270);
     lv_obj_set_style_arc_color(ui_ArcGearNumBack, lv_color_hex( COLOR_SECONDARY_PINK), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_ArcGearNumBack, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(ui_ArcGearNumBack, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -193,5 +151,8 @@ void ui_ScreenPageMain_screen_init(void)
 
     lv_obj_add_event_cb(ui_ArcGearNumBack, ui_event_main_background, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_ScreenPageMain, ui_event_main_background, LV_EVENT_GESTURE, NULL);
+    lv_obj_add_event_cb(ui_ScreenPageMain, ui_event_main_background, LV_EVENT_LONG_PRESSED, NULL);
+    lv_obj_add_event_cb(ui_ScreenPageMain, ui_event_main_background, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
+    lv_obj_add_event_cb(ui_ScreenPageMain, ui_event_main_background, LV_EVENT_RELEASED, NULL);
 
 }

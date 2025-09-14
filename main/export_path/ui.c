@@ -7,6 +7,7 @@
 #include "ui_helpers.h"
 #include <driver/gpio.h>
 #include "bsp_obd_dsp/bsp_board.h"
+#include "bsp_obd_dsp/nvs_storage.h"
 
 
 static const char *TAG = "ui";
@@ -21,8 +22,6 @@ void ui_ScreenPageMain_screen_init(void);
 lv_obj_t * ui_ScreenPageMain;
 lv_obj_t * ui_ImageMainPageback;
 lv_obj_t * ui_SpinnerMainPage;
-lv_obj_t * ui_ArcGeningRpm;
-lv_obj_t * ui_ArcCarSpeed;
 lv_obj_t * ui_ArcGearNumBack;
 lv_obj_t * ui_LabelGeningRpmText;
 lv_obj_t * ui_LabelGeningRpmUnitText;
@@ -34,6 +33,19 @@ lv_obj_t * ui_ContainerMainPageMlieageBlock;
 lv_obj_t * ui_LabelMainMlieageText;
 lv_obj_t * ui_LabelMainMieageNum;
 // CUSTOM VARIABLES
+typedef enum {
+    INFO_NONE = 0,
+    INFO_TRIP,
+    INFO_ODO,
+    INFO_MAX,
+    INFO_AVG,
+    INFO_TIME,
+    INFO_MODE_COUNT
+} info_mode_t;
+
+static info_mode_t s_info_mode = INFO_NONE; // 默认显示档位
+
+static uint32_t s_trip_press_start = 0;
 
 
 // SCREEN: ui_ScreenPageGear
@@ -79,9 +91,12 @@ lv_obj_t * ui_ImageEggBlackEar;
 // EVENTS
 lv_obj_t * ui____initial_actions0;
 
-// IMAGES AND IMAGE SETS
- 
 
+static uint16_t usClearTripDataTimeCnt = 0;
+
+// IMAGES AND IMAGE SETS
+ #define CLEAR_TRIP_TIME 2000 //清除TRIP数据长按时间，单位ms
+ 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #define RPM_MAX 5000
 #define SPEED_MAX 160
@@ -100,9 +115,14 @@ void my_timerMain(lv_timer_t * timer)
     lv_label_set_text_fmt(ui_LabelGeningRpmText, "%d", usRpm);
     lv_label_set_text_fmt(ui_LabelCarSpeedText, "%d", ucSpeed);
     lv_label_set_text_fmt (ui_LabelGearNumText, pGearNum[eGear]);
-    lv_arc_set_value(ui_ArcGeningRpm, (uint32_t)usRpm*100/RPM_MAX);
-    lv_arc_set_value(ui_ArcCarSpeed, (uint16_t)ucSpeed*100/SPEED_MAX);
-    lv_arc_set_value(ui_ArcGearNumBack, (uint16_t)eGear*100/5);
+    if(s_info_mode == INFO_TRIP && usClearTripDataTimeCnt != 0)//清除TRIP数据时，显示清除进度
+    {
+        lv_arc_set_value(ui_ArcGearNumBack, (uint16_t)100*usClearTripDataTimeCnt/(CLEAR_TRIP_TIME/100));      
+    }
+    else//正常显示档位
+    {
+        lv_arc_set_value(ui_ArcGearNumBack, (uint16_t)eGear*100/5);
+    }
 
 /*档位页面*/
     lv_label_set_text_fmt(ui_GearPageArcLabelGearNumText, pGearNum[eGear]);
@@ -129,6 +149,47 @@ void my_timerMain(lv_timer_t * timer)
         }
 #endif
 
+    /* 底部信息栏更新 */
+    nvs_stat_t stat = nvs_stat_get_mileage();
+    switch(s_info_mode){
+        case INFO_NONE:
+            lv_obj_add_flag(ui_ContainerMainPageMlieageBlock, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(ui_LabelGearNumText, LV_OBJ_FLAG_HIDDEN);
+            break;
+        case INFO_TRIP:
+            lv_obj_clear_flag(ui_ContainerMainPageMlieageBlock, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(ui_LabelGearNumText, LV_OBJ_FLAG_HIDDEN);
+            lv_label_set_text_fmt(ui_LabelMainMlieageText, "%d.%d", stat.trip_m/1000, stat.trip_m/100%10);
+            lv_label_set_text(ui_LabelMainMieageNum, "TRIP");
+            break;
+        case INFO_ODO:
+            lv_obj_clear_flag(ui_ContainerMainPageMlieageBlock, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(ui_LabelGearNumText, LV_OBJ_FLAG_HIDDEN);
+            lv_label_set_text_fmt(ui_LabelMainMlieageText, "%d", stat.odometer_m/1000);
+            lv_label_set_text(ui_LabelMainMieageNum, "ODO");
+            break;
+        case INFO_MAX:
+            lv_obj_clear_flag(ui_ContainerMainPageMlieageBlock, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(ui_LabelGearNumText, LV_OBJ_FLAG_HIDDEN);
+            lv_label_set_text_fmt(ui_LabelMainMlieageText, "%d", stat.max_speed_kmh);
+            lv_label_set_text(ui_LabelMainMieageNum, "MAX");
+            break;
+        case INFO_AVG:
+            lv_obj_clear_flag(ui_ContainerMainPageMlieageBlock, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(ui_LabelGearNumText, LV_OBJ_FLAG_HIDDEN);
+            lv_label_set_text_fmt(ui_LabelMainMlieageText, "%d", stat.avg_speed_kmh);
+            lv_label_set_text(ui_LabelMainMieageNum, "AVG");
+            break;
+        case INFO_TIME:
+            lv_obj_clear_flag(ui_ContainerMainPageMlieageBlock, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(ui_LabelGearNumText, LV_OBJ_FLAG_HIDDEN);
+            uint32_t hrs = stat.run_time_s/3600;
+            uint32_t mins = (stat.run_time_s%3600)/60;
+            lv_label_set_text_fmt(ui_LabelMainMlieageText, "%02d:%02d", hrs, mins);
+            lv_label_set_text(ui_LabelMainMieageNum, "TIME");
+            break;
+        default: break;
+    }
 
     //在logo 页面 3s后自动跳转主页面
     if(ui_ScreenPageLogo)
@@ -167,14 +228,53 @@ void ui_event_logo_background(lv_event_t * e)
 void ui_event_main_background(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) { 
-        lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&ui_ScreenPageGear, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageGear_screen_init);  
+    if(event_code == LV_EVENT_GESTURE){
+        lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
+        if(dir == LV_DIR_LEFT){
+            lv_indev_wait_release(lv_indev_get_act());
+            _ui_screen_change(&ui_ScreenPageGear, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageGear_screen_init);
+        }else if(dir == LV_DIR_RIGHT){
+            lv_indev_wait_release(lv_indev_get_act());
+            _ui_screen_change(&ui_ScreenPageEasterEgg, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageEasterEgg_screen_init);
+        }else if(dir == LV_DIR_TOP){
+            s_info_mode = (s_info_mode + 1) % INFO_MODE_COUNT;
+        }else if(dir == LV_DIR_BOTTOM){
+            s_info_mode = (s_info_mode + INFO_MODE_COUNT -1) % INFO_MODE_COUNT;
+        }
     }
-    else if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
-        lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&ui_ScreenPageEasterEgg, LV_SCR_LOAD_ANIM_FADE_ON, 5, 0, &ui_ScreenPageEasterEgg_screen_init);  
+    else if(event_code == LV_EVENT_LONG_PRESSED)//按下500ms触发长按
+    {
+        s_trip_press_start = lv_tick_get();
+        usClearTripDataTimeCnt = 0;
+        ESP_LOGI(TAG, "LV_EVENT_LONG_PRESSED ! \n");
     }
+    else if(event_code == LV_EVENT_LONG_PRESSED_REPEAT)//触发长按后，每100ms触发一次
+    {
+        ESP_LOGI(TAG, "LV_EVENT_LONG_PRESSED_REPEAT ! \n");
+        //Trip 页面 && 速度为0 && Trip数据大于0.1km（100m）
+        if(s_info_mode == INFO_TRIP && obd_data_get_speed() == 0 && nvs_stat_get_mileage().trip_m > 100)
+        {
+            usClearTripDataTimeCnt++;
+            if(usClearTripDataTimeCnt >= CLEAR_TRIP_TIME/100)
+            {
+                usClearTripDataTimeCnt = 0;
+                nvs_stat_reset_trip();
+            }
+        }
+        else
+        {
+            usClearTripDataTimeCnt = 0;
+        }
+    }
+    else if(event_code == LV_EVENT_RELEASED)//释放
+    {
+        ESP_LOGI(TAG, "LV_EVENT_RELEASED ! \n");
+        if(usClearTripDataTimeCnt)
+        {
+            usClearTripDataTimeCnt = 0;        
+        }
+    }
+
 }
 void ui_event_gear_background(lv_event_t * e)
 {
